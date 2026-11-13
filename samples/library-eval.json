@@ -1,0 +1,206 @@
+{
+  "frozen_on": "2026-11-13",
+  "scope": "成都校区图书馆服务与 2027 年普通硕士招生，共用 Top 5",
+  "questions": [
+    {
+      "id": "L1",
+      "category": "常规开放与自助借还",
+      "question": "成都总馆平时几点开到几点，周日也能用自助借还机吗？",
+      "answerability": "answered",
+      "topics": [
+        "library"
+      ],
+      "expected": "常规周一至周日 8:00–22:00，总馆开馆时间提供自动借还仪服务，法定节假日或临时变动按公告。",
+      "evidence": [
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1858.80/marx/map.html",
+            "terms": [
+              "周一",
+              "8:00--22:00",
+              "所有开馆时间提供自动借还仪借还服务"
+            ],
+            "library_scope": {
+              "building": "成都总馆"
+            }
+          }
+        ]
+      ]
+    },
+    {
+      "id": "L2",
+      "category": "临时通知末日",
+      "question": "2026年12月18日晚上十点十分，我还能在成都二期图书馆自习吗？",
+      "answerability": "answered",
+      "topics": [
+        "library"
+      ],
+      "expected": "按公告，成都总馆、分馆晚间延长至22:30，12月18日是有效期最后一天，22:10在延长时间内。不要推断借还服务延时。",
+      "evidence": [
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20261019.html",
+            "terms": [
+              "2026年10月19日至12月18日",
+              "成都校区图书馆总馆、分馆",
+              "22:30"
+            ],
+            "library_scope": {
+              "notice_kind": "temporary",
+              "effective_to": "2026-12-18"
+            }
+          }
+        ]
+      ]
+    },
+    {
+      "id": "L3",
+      "category": "超出临时通知",
+      "question": "成都分馆2026年12月19日还按延长后的时间关门吗？",
+      "answerability": "answered",
+      "topics": [
+        "library"
+      ],
+      "expected": "延时公告截至12月18日，不能将22:30套到12月19日。仅给出归档的常规22:00并注明其他通知优先。排序不得把过期公告作为12月19日适用证据。",
+      "evidence": [
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1858.80/marx/map.html",
+            "terms": [
+              "各阅览区、咨询处",
+              "8:00--22:00"
+            ],
+            "library_scope": {
+              "building": "成都分馆"
+            }
+          }
+        ]
+      ],
+      "excluded_urls": [
+        "https://lib.swpu.edu.cn/1849.8080/noticex/20261019.html"
+      ]
+    },
+    {
+      "id": "L4",
+      "category": "读者类别与续借方式",
+      "question": "我是研究生，在成都图书馆借的书能续几次、每次多久，在哪里操作？",
+      "answerability": "answered",
+      "topics": [
+        "library"
+      ],
+      "expected": "研究生可续两次，每次30天。可通过我的图书馆、移动图书馆续借。",
+      "evidence": [
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1858.80/marx/role_list.html?id=2",
+            "terms": [
+              "可续借2次",
+              "每次续借期30天"
+            ],
+            "library_scope": {
+              "reader_group": "graduate"
+            }
+          }
+        ],
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1858.80/marx/guide.html",
+            "terms": [
+              "我的图书馆",
+              "移动图书馆",
+              "进行续借操作"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "L5",
+      "category": "馆舍歧义",
+      "question": "2026年8月1日，成都校区图书馆晚上几点关门？",
+      "answerability": "clarify",
+      "topics": [
+        "library"
+      ],
+      "expected": "先询问一期总馆还是二期分馆。暑期同日总馆明确列时，分馆未列，不应给两馆统一时间。",
+      "evidence": []
+    },
+    {
+      "id": "L6",
+      "category": "图书馆与招生复合",
+      "question": "计算机与软件学院全日制085404初试第四门是什么？另外，2026年11月20日成都总馆晚上开到几点？",
+      "answerability": "answered",
+      "topics": [
+        "admissions",
+        "library"
+      ],
+      "expected": "招生：全日制085404第四门408计算机学科专业基础。图书馆：11月20日在延长通知内，成都总馆晚间至22:30。分别引用两种主题的原件。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+            "pdf_page": 6,
+            "terms": [
+              "085404计算机技术",
+              "408计算机学科专业基础"
+            ]
+          }
+        ],
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20261019.html",
+            "terms": [
+              "2026年10月19日至12月18日",
+              "成都校区图书馆总馆、分馆",
+              "22:30"
+            ],
+            "library_scope": {
+              "notice_kind": "temporary"
+            }
+          }
+        ]
+      ]
+    },
+    {
+      "id": "L7",
+      "category": "缺实时证据",
+      "question": "成都总馆今晚八点还剩多少个自习座位？",
+      "answerability": "insufficient",
+      "topics": [
+        "library"
+      ],
+      "expected": "公开存档没有该时点的实时余座信息，不给座位数字。馆藏或总座位数不等于剩余数。",
+      "evidence": [],
+      "unsupported": [
+        "实时剩余座位"
+      ]
+    },
+    {
+      "id": "L8",
+      "category": "暑期馆舍与日期行",
+      "question": "2026年8月1日我要去成都一期图书馆，几点能进、几点关门？",
+      "answerability": "answered",
+      "topics": [
+        "library"
+      ],
+      "expected": "成都一期总馆在7月20日至8月26日开放9:00–21:00，应引用总馆适用的暑期表格行。",
+      "evidence": [
+        [
+          {
+            "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260710.html",
+            "terms": [
+              "7月20日-8月26日",
+              "总馆",
+              "9:00-21:00"
+            ],
+            "library_scope": {
+              "building": "成都总馆",
+              "effective_from": "2026-07-20",
+              "effective_to": "2026-08-26"
+            }
+          }
+        ]
+      ]
+    }
+  ]
+}

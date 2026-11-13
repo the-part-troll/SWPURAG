@@ -1,0 +1,225 @@
+{
+  "frozen_on": "2026-11-12",
+  "scope": "2027 年普通硕士全日制与非全日制目录在同一语料上对照；原 D4 属历史语料",
+  "questions": [
+    {
+      "id": "F1",
+      "category": "指定全日制",
+      "question": "2027年计算机与软件学院的全日制085404，第四门考什么？专业拟招多少人，其中拟招推免多少？",
+      "answerability": "answered",
+      "expected": "全日制 085404 第四门 408 计算机学科专业基础，专业拟招 45 人含推免，拟招推免 5 人。按全日制页行引证。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+            "pdf_page": 6,
+            "terms": [
+              "006计算机与软件学院",
+              "085404计算机技术",
+              "408计算机学科专业基础",
+              "拟招全日制人数(含推免):45",
+              "拟招推免人数:5"
+            ]
+          }
+        ]
+      ],
+      "allowed_catalog_scopes": [
+        [
+          "全日制",
+          "计算机与软件学院"
+        ]
+      ]
+    },
+    {
+      "id": "F2",
+      "category": "指定非全日制",
+      "question": "我选计算机与软件学院非全日制085404，这个专业拟招多少人，第四门还考408吗？",
+      "answerability": "answered",
+      "expected": "非全日制 085404 专业拟招 10 人，不含单考，第四门 408；不能使用全日制 45 或推免 5。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 2,
+            "terms": [
+              "006计算机与软件学院",
+              "085404计算机技术",
+              "408计算机学科专业基础",
+              "专业拟招生非全日制人数(不含单考):10"
+            ]
+          }
+        ]
+      ],
+      "allowed_catalog_scopes": [
+        [
+          "非全日制",
+          "计算机与软件学院"
+        ]
+      ]
+    },
+    {
+      "id": "F3",
+      "category": "同院同码双目录对比",
+      "question": "石油与天然气工程学院085706的03油气储运工程，全日制和非全日制的方向拟招人数和第四门科目分别是什么？",
+      "answerability": "answered",
+      "expected": "同学院同方向，全日制方向拟招 27 人含推免（拟推免 10），非全日制方向拟招 4 人不含单考，两者第四门均 801 工程流体力学。不可把专业总数199或23当方向人数。分别引两份目录。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+            "pdf_page": 1,
+            "terms": [
+              "085706",
+              "油气储运工程",
+              "方向拟招全日制人数(含推免):27",
+              "801工程流体力学"
+            ]
+          }
+        ],
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 1,
+            "terms": [
+              "085706",
+              "油气储运工程",
+              "方向拟招生非全日制人数(不含单考):4",
+              "801工程流体力学"
+            ]
+          }
+        ]
+      ],
+      "allowed_catalog_scopes": [
+        [
+          "全日制",
+          "石油与天然气工程学院"
+        ],
+        [
+          "非全日制",
+          "石油与天然气工程学院"
+        ]
+      ]
+    },
+    {
+      "id": "F4",
+      "category": "缺范围需澄清",
+      "question": "085706第四门专业课考什么？",
+      "answerability": "clarify",
+      "expected": "仅凭专业代码无法确定第四门。先询问学习方式与学院，并可请用户补充研究方向；不要把 801、802 或 839 中任一科目当作统一答案。",
+      "evidence": [],
+      "unsupported": [
+        "未指定学习方式、学院、方向"
+      ]
+    },
+    {
+      "id": "F5",
+      "category": "同码按学院筛选",
+      "question": "我报经管学院的非全日制085706，第四门是油层物理还是管理学原理？",
+      "answerability": "answered",
+      "expected": "经济管理学院非全日制 085706 石油与天然气工程管理方向第四门 839 管理学原理。石油与天然气工程学院油气井方向的 802 不适用。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 4,
+            "terms": [
+              "010经济管理学院",
+              "085706",
+              "石油与天然气工程管理",
+              "839管理学原理"
+            ]
+          }
+        ]
+      ],
+      "allowed_catalog_scopes": [
+        [
+          "非全日制",
+          "经济管理学院"
+        ]
+      ]
+    },
+    {
+      "id": "F6",
+      "category": "配对方式和学院的双目录对比",
+      "question": "石工院全日制085706的01油气井工程，和经管院非全日制085706的01石油与天然气工程管理，第四门一样吗？",
+      "answerability": "answered",
+      "expected": "不一样。石油与天然气工程学院全日制油气井工程 802 油层物理，经济管理学院非全日制石油与天然气工程管理 839 管理学原理；分别引用正确目录。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+            "pdf_page": 1,
+            "terms": [
+              "001石油与天然气工程学院",
+              "085706",
+              "油气井工程",
+              "802油层物理"
+            ]
+          }
+        ],
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 4,
+            "terms": [
+              "010经济管理学院",
+              "085706",
+              "石油与天然气工程管理",
+              "839管理学原理"
+            ]
+          }
+        ]
+      ],
+      "allowed_catalog_scopes": [
+        [
+          "全日制",
+          "石油与天然气工程学院"
+        ],
+        [
+          "非全日制",
+          "经济管理学院"
+        ]
+      ]
+    },
+    {
+      "id": "F7",
+      "category": "目录加适用章程",
+      "question": "报考计软学院全日制085404，初试四门考什么？我大专毕业，按章程要满多久？",
+      "answerability": "answered",
+      "expected": "全日制 085404 初试 101、204、302、408。章程普通学业条件是国家承认的专科学历从毕业至录取当年入学前满两年，按本科同等学力报考；不能断定满足全部资格。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+            "pdf_page": 6,
+            "terms": [
+              "006计算机与软件学院",
+              "085404计算机技术",
+              "101",
+              "204",
+              "302",
+              "408计算机学科专业基础"
+            ]
+          }
+        ],
+        [
+          {
+            "page": "8520.htm",
+            "terms": [
+              "专科",
+              "满2年",
+              "到录取当年入学前",
+              "同等学力"
+            ]
+          }
+        ]
+      ],
+      "allowed_catalog_scopes": [
+        [
+          "全日制",
+          "计算机与软件学院"
+        ]
+      ]
+    }
+  ]
+}

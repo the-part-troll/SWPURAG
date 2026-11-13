@@ -1,0 +1,8 @@
+name: SWPU_RAG
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - -r requirements-pdf.txt

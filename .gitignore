@@ -219,5 +219,47 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-#new
-.idea/
+# Local credentials and configuration
+/envir/
+/.aws/
+/.ssh/
+.env.*
+!.env.example
+.netrc
+_netrc
+.npmrc
+*.key
+*.pem
+*.pfx
+*.p12
+
+# Local environments, editor settings and OS files
+/rag_env/
+/SWPU_RAG/
+/conda-meta/
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Generated SQLite databases and companion files, including custom paths
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Scratch files and private runs
+/tmp/
+/.test-*/
+/data/local/
+/reports/local/
+*.tmp

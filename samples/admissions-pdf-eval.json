@@ -1,0 +1,137 @@
+{
+  "frozen_on": "2026-11-12",
+  "scope": "2027 年普通非全日制目录与现有招生政策",
+  "questions": [
+    {
+      "id": "D1",
+      "category": "专业代码与方向",
+      "question": "我报石油与天然气工程学院的085706，想选03油气储运工程，初试四门分别考什么？",
+      "answerability": "answered",
+      "expected": "非全日制 03 方向，101 思想政治理论、204 英语二或 202 俄语、302 数学二、801 工程流体力学。不能套用同专业其他方向的 802。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 1,
+            "terms": [
+              "085706",
+              "油气储运工程",
+              "101",
+              "204",
+              "202",
+              "302",
+              "801工程流体力学"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "D2",
+      "category": "跨页同码异院",
+      "question": "都是085706，石工院油气井工程和经管学院石油与天然气工程管理的第四门初试课一样吗？",
+      "answerability": "answered",
+      "expected": "两条都是非全日制，但学院和方向不同。石油与天然气工程学院油气井工程为 802 油层物理，经济管理学院石油与天然气工程管理为 839 管理学原理。分别引用第 1、4 页。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 1,
+            "terms": [
+              "085706",
+              "油气井工程",
+              "802油层物理"
+            ]
+          }
+        ],
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 4,
+            "terms": [
+              "085706",
+              "石油与天然气工程管理",
+              "839管理学原理"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "D3",
+      "category": "章程加目录",
+      "question": "非全日制工程管理（125601）初试科目有哪些？如果是大专毕业，章程要求至少几年工作经验？",
+      "answerability": "answered",
+      "expected": "目录为 199 管理类综合能力和 204 英语二；章程对工程管理专业学位专科毕业者要求符合学院相关学业要求，达到本科毕业同等学力并有五年以上工作经验。分别引用目录与章程。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 3,
+            "terms": [
+              "125601",
+              "199管理类综合能力",
+              "204英语二"
+            ]
+          }
+        ],
+        [
+          {
+            "page": "8520.htm",
+            "terms": [
+              "专科",
+              "相关学业要求",
+              "5年以上工作经验"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "D4",
+      "category": "全日制与非全日制边界",
+      "question": "我准备报2027年全日制的085404计算机技术，能按这份非全日制目录的408准备吗？",
+      "answerability": "insufficient",
+      "expected": "可说明 408 是这份目录的非全日制 085404 行证据；全日制须核对相应目录，当前证据无法确认全日制科目。不能把不同学习方式的科目互相套用。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 2,
+            "terms": [
+              "085404",
+              "非全日制",
+              "408计算机学科专业基础"
+            ]
+          }
+        ]
+      ],
+      "unsupported": [
+        "2027 年全日制 085404 初试科目"
+      ]
+    },
+    {
+      "id": "D5",
+      "category": "拟招生与实际录取",
+      "question": "2027年非全日制计算机技术085404最后实际录取了多少人？",
+      "answerability": "insufficient",
+      "expected": "目录为拟招生范围，可提及拟招 10 人且不含单考（若证据提供），但不能将它当作实际录取人数，明确缺少最终录取结果。",
+      "evidence": [
+        [
+          {
+            "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+            "pdf_page": 2,
+            "terms": [
+              "085404",
+              "非全日制",
+              "计算机技术"
+            ]
+          }
+        ]
+      ],
+      "unsupported": [
+        "最终实际录取人数"
+      ]
+    }
+  ]
+}

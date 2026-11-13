@@ -1,0 +1,411 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>
+
+
+<title>学校概况-西南石油大学门户网站</title><meta name="pageType" content="2">
+<meta name="pageTitle" content="学校概况">
+<META Name="keywords" Content="西南石油大学门户网站,学校概况" />
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<link href="../css/framework.css" rel="stylesheet" type="text/css" media="all">
+<link href="../css/Subpublic.css" rel="stylesheet" type="text/css" media="all">
+<link href="../css/Sublayout.css" rel="stylesheet" type="text/css" media="all">
+<head><NOSCRIPT><IFRAME width="0" height="0" src="../*.html" style="display:none"></IFRAME></NOSCRIPT>
+<!--Announced by Visual SiteBuilder 9-->
+<script language="javascript" src="../_sitegray/_sitegray.js"></script>
+<!-- CustomerNO:77656262657232307476475750555742000500014456 -->
+<link rel="stylesheet" type="text/css" href="../Xxxgk.vsb.css" />
+<script type="text/javascript" src="/system/resource/js/vsbscreen.min.js" id="_vsbscreen" devices="pc|mobile|pad"></script>
+<script type="text/javascript" src="/system/resource/js/counter.js"></script>
+<script type="text/javascript">_jsq_(1003,'/Xxxgk.jsp',-1,1645096081)</script>
+</head><body id="top" onselect="document.selection.empty()" onselectstart="return false" oncopy="document.selection.empty()" onbeforecopy="return false" ondragstart="return false" oncontextmenu="return false">
+<div class="clear" id="topmenu">
+<div class="wrapper row0" id="topbar">
+  <div id="header">
+   <div class="fl_left">
+     <nav>
+       <script language="javascript" src="/system/resource/js/dynclicks.js"></script><script language="javascript" src="/system/resource/js/openlink.js"></script>    <a href="../yhdh/xs.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60627)">学生</a>
+    <a href="../yhdh/jg.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60628)">教工</a>
+    <a href="../yhdh/ks.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60629)">考生</a>
+    <a href="https://xy.swpu.edu.cn/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60630)">校友</a>
+    <a href="../yhdh/mt.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60631)">媒体</a>
+
+    </nav> 
+  </div>
+ <div class="fl_right">
+      <!-- 3.1.3版本 -->
+
+
+
+<script language="javascript" src="/system/resource/js/base64.js"></script><script language="javascript" src="/system/resource/js/jquery/jquery-latest.min.js"></script><script language="javascript" src="/system/resource/vue/vue.js"></script><script language="javascript" src="/system/resource/vue/bluebird.min.js"></script><script language="javascript" src="/system/resource/vue/axios.js"></script><script language="javascript" src="/system/resource/vue/polyfill.js"></script><script language="javascript" src="/system/resource/vue/token.js"></script><LINK href="/system/resource/vue/static/element/index.css" type="text/css" rel="stylesheet"><script language="javascript" src="/system/resource/vue/static/element/index.js"></script><script language="javascript" src="/system/resource/vue/static/public.js"></script><script language="javascript" src="/system/resource/openapp/search/js/containsHtmlTags.js"></script><script language="javascript" src="/system/resource/openapp/search/layui/layui.js"></script><div id="divu1"></div>
+<script type="text/html" id="htmlu1">
+    <div id="appu1">
+        <div v-if="!isError">
+       <div class="clear form">
+        
+         <fieldset>
+          <legend>Search:</legend>
+          <input  maxlength="20" type="text" value="" placeholder="输入搜索" autocomplete=off v-model=query.keyWord @keyup.enter="onSubmit">
+          <button STYLE="font-size:10px;margin-left:0px;text-indent:1px;padding:0px;"  type="image"  class="fa fa-search" type="submit" title="Search"  v-on:click="onSubmit()">
+           <img src="../images/redbackground/search_s.png">
+           </button>
+        </fieldset>
+        
+           </div>
+          
+        </div>
+        <div v-if="isError" style="color: #b30216; font-size:18px;text-align: center;padding:20px;">
+            应用维护中！
+        </div>
+    </div>
+</script>
+<script>
+    $("#divu1").html($("#htmlu1").text());
+</script>
+<script>
+    var appOwner = "1645096081";
+    var token = gettoken(10);
+    var urlPrefix = "/aop_component/";
+
+    jQuery.support.cors = true;
+    $.ajaxSetup({
+        beforeSend: function (request, settings) {
+            request.setRequestHeader("Authorization", token);
+            request.setRequestHeader("owner", appOwner);
+        }
+    });
+
+    new Vue({
+        el: "#appu1",
+        data: function () {
+            return {
+                query: {
+                    keyWord: "",//搜索关键词
+                    owner: appOwner,
+                    token: token,
+                    urlPrefix: urlPrefix,
+                    lang:"i18n_zh_CN"
+                },
+                isError: false
+            }
+        },
+        mounted: function () {
+            var _this = this;
+            // _this.init();
+        },
+        methods: {
+            init: function(){
+                $.ajax({
+                    url: "/aop_component//webber/search/test",
+                    type: "get",
+                    success: function (response) {
+                        if (response.code == "0000") {
+                        } else if (response.code == "220") {
+                            _this.isError = true;
+                            console.log(response);
+                        } else if (!response.code) {
+                            _this.isError = true;
+                            console.log(response);
+                        }
+                    },
+                    error: function (response) {
+                        _this.isError = true;
+                    }
+                });
+            },
+            onSubmit: function (e) {
+                var url = "/aop_views/search/modules/resultpc/soso.html";
+                if ("10" == "1" || "10" == "2") {
+                    url = "" + url;
+                }
+                var _this = this;
+                var query = _this.query;
+                if (url.indexOf("?") > -1) {
+                    url = url.split("?")[0];
+                }
+                if (query.keyWord) {
+                    var query = new Base64().encode(JSON.stringify(query));
+                    window.open(url + "?query=" + query);
+                } else {
+                    alert("请填写搜索内容")
+                }
+            },
+        }
+    })
+</script>
+
+<script>
+   var appElementu1 = document.querySelector("#appu1");
+   if (appElementu1 && appElementu1.__vue__) {
+
+   } else {
+      $("#divu1").html($("#htmlu1").text());
+      var appOwner = "1645096081";   
+      var urlPrefix = "/aop_component/";
+      var ifLogin="";
+      var token = ifLogin=='true'?gettoken(10, true).trim():'tourist';
+      if (containsHtmlTags(token) || !token) { 
+         token = 'tourist';
+      }
+      jQuery.support.cors = true;
+      $.ajaxSetup({
+        beforeSend: function (request, settings) {
+            request.setRequestHeader("Authorization", token);
+            request.setRequestHeader("owner", appOwner);
+        }
+      });
+      var queryInfou1 = {
+        query: {
+            keyWord: "",//搜索关键词
+            owner: appOwner,
+            token: token,
+            urlPrefix: urlPrefix,
+            lang:"i18n_zh_CN"
+        },
+        isError: false
+      };
+      function keyUpFunu1(e){
+        var theEvent = e || window.event;
+        var keyCode = theEvent.keyCode || theEvent.which || theEvent.charCode;
+        if(keyCode == 13){
+          onSubmitu1();
+        }
+      };
+
+      function onSubmitu1(e) {
+        queryInfou1.query.keyWord= $("#appu1  .qwss").val();
+        
+        var url = "/aop_views/search/modules/resultpc/soso.html";      
+        if ("10" == "1" || "10" == "2") {
+           url = "" + url;
+        }
+        var query = queryInfou1.query;
+        if (url.indexOf("?") > -1) {
+            url = url.split("?")[0];
+        }
+        if (query.keyWord) {
+            var query = new Base64().encode(JSON.stringify(query));
+            window.open(url + "?query=" + query);
+        } else {
+            alert("请填写搜索内容")
+        }
+      };
+   }
+</script>
+  </div>
+  <div class="fl_right"> 
+    <nav>
+          <a href="https://www.swpu.edu.cn/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 67435)" style="color:#f00;">本站首页</a>   
+    <A class="topseperate">|</A>
+    <a href="https://www.swpu.edu.cn/en/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60632)">ENGLISH</a>
+    <A class="topseperate">|</A>
+    <a href="https://www.swpu.edu.cn/nc/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 67680)">南充校区</a>
+    <A class="topseperate">|</A>
+    <a href="https://my.swpu.edu.cn/EIP/nonlogin/homePage.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60634)">一网通办</a>
+    <A class="topseperate">|</A>
+    <a href="https://wllz.swpu.edu.cn/yjfk/app/appindex" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60635)">网络理政</a>
+    <A class="topseperate">|</A>
+    <a href="../bgw.htm" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60636)">办公网</a>
+    <A class="topseperate">|</A>
+    <a href="https://mail.swpu.edu.cn/" target="_blank" title="" onclick="_addDynClicks(&#34;wburl&#34;, 1645096081, 60637)">电子邮件</a>
+
+    </nav>
+    </div>
+ 
+    </div>
+  </div>
+ </div>
+
+<!-- ################################################################################################ -->
+<div class="clear" id="topnav">
+  <div class="wrapper row0" id="mcontent"><!--第三层 导航开始-->
+    <div style="margin:10px 0px;"><a href="https://www.swpu.edu.cn/"><img src="../images/public/topbg2023.png"></a></div>  
+    <div class="navigation" id="navigation"><ul>    <LI>
+     <A href="xxgk.htm" target="new" title="校情总览" class="animsition-link">校情总览</A> 
+          <ul>
+           <li><A href="xxgk.htm" target="new" title="学校概况">学校概况</A></li>
+           <li><A href="xxzc.htm" target="new" title="学校章程">学校章程</A></li>
+           <li><A href="tjxx.htm" target="new" title="统计信息">统计信息</A></li>
+           <li><A href="lsyg.htm" target="new" title="历史沿革">历史沿革</A></li>
+           <li><A href="xrld.htm" target="new" title="现任领导">现任领导</A></li>
+           <li><A href="lrld.htm" target="new" title="历任领导">历任领导</A></li>
+           <li><A href="dsj1/a1958_1967.htm" target="new" title="大事记">大事记</A></li>
+           <li><A href="xcp.htm" target="new" title="宣传片">宣传片</A></li>
+           <li><A href="dxjs.htm" target="new" title="大学精神">大学精神</A></li>
+           <li><A href="xyfg.htm" target="new" title="校园风光">校园风光</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="../jgsz/xysz.htm" target="new" title="机构设置" class="animsition-link">机构设置</A> 
+          <ul>
+           <li><A href="../jgsz/xysz.htm" target="new" title="学院设置">学院设置</A></li>
+           <li><A href="../jgsz/glfw.htm" target="new" title="管理服务">管理服务</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="../szdw/szgk.htm" target="new" title="师资队伍" class="animsition-link">师资队伍</A> 
+          <ul>
+           <li><A href="../szdw/szgk.htm" target="new" title="师资概况">师资概况</A></li>
+           <li><A href="../szdw/jcsz.htm" target="new" title="杰出师资">杰出师资</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="../jyjx/yjsjy/yjsjy.htm" target="new" title="教育教学" class="animsition-link">教育教学</A> 
+          <ul>
+           <li><A href="https://www.swpu.edu.cn/dean/" target="new" title="本科生教育">本科生教育</A></li>
+           <li><A href="https://www.swpu.edu.cn/gs/" target="new" title="研究生教育">研究生教育</A></li>
+           <li><A href="https://www.swpu.edu.cn/oice/" target="new" title="留学生教育">留学生教育</A></li>
+           <li><A href="https://www.swpu.edu.cn/c_jy" target="new" title="继续教育">继续教育</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="../kxyj/kyjdpt.htm" target="new" title="科学研究" class="animsition-link">科学研究</A> 
+          <ul>
+           <li><A href="../kxyj/yjly.htm" target="new" title="研究领域">研究领域</A></li>
+           <li><A href="../kxyj/kyxm.htm" target="new" title="科研项目">科研项目</A></li>
+           <li><A href="../kxyj/hjcg.htm" target="new" title="获奖成果">获奖成果</A></li>
+           <li><A href="https://www.swpu.edu.cn/kyc/cgyfb/cgfb.htm" target="new" title="成果发布">成果发布</A></li>
+           <li><A href="https://www.swpu.edu.cn/xbzx/" target="new" title="学报中心">学报中心</A></li>
+           <li><A href="https://lib.swpu.edu.cn/1849.8080/noticex/20170515.html" target="new" title="学术论文投稿指南">学术论文投稿指南</A></li>
+           <li><A href="https://www.swpu.edu.cn/lab/" target="new" title="全国重点实验室">全国重点实验室</A></li>
+           <li><A href="../kxyj/bshkyldz.htm" target="new" title="博士后科研流动站">博士后科研流动站</A></li>
+           <li><A href="../kxyj/xsjz.htm" target="new" title="学术兼职">学术兼职</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="" target="new" title="招生就业" class="animsition-link">招生就业</A> 
+          <ul>
+           <li><A href="http://zsb.swpu.edu.cn/" target="new" title="本科生招生">本科生招生</A></li>
+           <li><A href="https://www.swpu.edu.cn/gs/zsgz/zsjz.htm" target="new" title="研究生招生">研究生招生</A></li>
+           <li><A href="https://www.swpu.edu.cn/c_jy/xljxjy/zsxx.htm" target="new" title="继续教育招生">继续教育招生</A></li>
+           <li><A href="https://www.swpu.edu.cn/oice/" target="new" title="留学生招生">留学生招生</A></li>
+           <li><A href="https://www.swpu.edu.cn/xgb/xszzgl_L/zzzn.htm" target="new" title="学生资助管理">学生资助管理</A></li>
+           <li><A href="http://jyzx.swpu.edu.cn/" target="new" title="就业指导服务">就业指导服务</A></li>
+           <li><A href="https://www.swpu.edu.cn/cxcy/" target="new" title="创新创业服务">创新创业服务</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="https://www.swpu.edu.cn/oice/" target="new" title="合作交流" class="animsition-link">合作交流</A> 
+          <ul>
+           <li><A href="https://www.swpu.edu.cn/oice/" target="new" title="国际合作交流">国际合作交流</A></li>
+           <li><A href="../hzjiao_l/xdhzjl.htm" target="new" title="校地合作交流">校地合作交流</A></li>
+           <li><A href="https://www.swpuspark.com/" target="new" title="国家大学科技园">国家大学科技园</A></li>
+           <li><A href="https://xy.swpu.edu.cn/" target="new" title="教育发展基金会">教育发展基金会</A></li>
+           <li><A href="https://xy.swpu.edu.cn/" target="new" title="校友工作">校友工作</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="../xysh/zxsj.htm" target="new" title="校园生活" class="animsition-link">校园生活</A> 
+          <ul>
+           <li><A href="https://www.yiban.cn/" target="new" title="易班">易班</A></li>
+           <li><A href="../xysh/cydh.htm" target="new" title="常用电话">常用电话</A></li>
+           <li><A href="../xysh/jxrl.htm" target="new" title="教学日历">教学日历</A></li>
+           <li><A href="../xysh/zxsj.htm" target="new" title="作息时间">作息时间</A></li>
+           <li><A href="../xysh/lxlx.htm" target="new" title="来校路线">来校路线</A></li>
+           <li><A href="../xysh/xydt/cdpmt.htm" target="new" title="校园地图">校园地图</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="../zpzb/rczc.htm" target="new" title="招聘招标" class="animsition-link">招聘招标</A> 
+          <ul>
+           <li><A href="../zpzb/rczc.htm" target="new" title="人才政策">人才政策</A></li>
+           <li><A href="../zpzb/zpxx.htm" target="new" title="招聘信息">招聘信息</A></li>
+           <li><A href="https://cwcggl.swpu.edu.cn" target="new" title="采购信息发布网">采购信息发布网</A></li>
+           </ul>
+    </LI>
+    <LI>
+     <A href="https://www.swpu.edu.cn/xxgk/xxgkw.htm" target="new" title="信息公开" class="animsition-link">信息公开</A> 
+    </LI>
+    <LI>
+     <A href="../bgw/bzhd.htm" target="new" title="本周活动" class="animsition-link" style="color:red;font-size:14px;font-weight:bolder;">本周活动</A> 
+    </LI>
+
+</ul></div>
+  </div>
+</div>
+<!-- ################################################################################################ -->
+<!-- ################################################################################################ -->
+<!--中间部分开始-->
+ 
+<div class="wrapper row3"> 
+ <div class="container clear" id="pmiddle">
+<!--左边部分--> 
+   <div class="one_six first fl_left"> 
+     <div id="navleft">
+         <div id="navtitle">
+校情总览</div>
+         <div id="left_nav"><ul style="margin:0px;padding:0px;">    <LI class="nav_selected"><A title="学校概况" class="init_style" href="xxgk.htm" onfocus="undefined" onfocus="undefined">学校概况</A> </LI>
+    <LI><A title="学校章程" class="init_style" href="xxzc.htm" onfocus="undefined" onfocus="undefined">学校章程</A> </LI>
+    <LI><A title="统计信息" class="init_style" href="tjxx.htm" onfocus="undefined" onfocus="undefined">统计信息</A> </LI>
+    <LI><A title="历史沿革" class="init_style" href="lsyg.htm" onfocus="undefined" onfocus="undefined">历史沿革</A> </LI>
+    <LI><A title="现任领导" class="init_style" href="xrld.htm" onfocus="undefined" onfocus="undefined">现任领导</A> </LI>
+    <LI><A title="历任领导" class="init_style" href="lrld.htm" onfocus="undefined" onfocus="undefined">历任领导</A> </LI>
+    <LI><A title="大事记" class="init_style" href="dsj1/a1958_1967.htm" onfocus="undefined" onfocus="undefined">大事记</A> </LI>
+    <LI><A title="宣传片" class="init_style" href="xcp.htm" onfocus="undefined" onfocus="undefined">宣传片</A> </LI>
+    <LI><A title="大学精神" class="init_style" href="dxjs.htm" onfocus="undefined" onfocus="undefined">大学精神</A> </LI>
+    <LI><A title="校园风光" class="init_style" href="xyfg.htm" onfocus="undefined" onfocus="undefined">校园风光</A> </LI>
+</ul></div>
+      </div>
+    </div>
+<!--右边部分开始-->
+   <div class="five_six"> 
+      <div id="navright">
+<div id="daohangright"><ul style="margin:0px;padding:0px;"><LI><A class="selectedjl" href="xxgk/xm.htm" title="校名" onfocus="undefined" onfocus="undefined">校名</A> </LI>    
+<LI><A class="selectedjl" href="xxgk/xh.htm" title="校徽" onfocus="undefined" onfocus="undefined">校徽</A> </LI>    
+<LI><A class="selectedjl" href="xxgk/xq.htm" title="校旗" onfocus="undefined" onfocus="undefined">校旗</A> </LI>    
+<LI><A class="selectedjl" href="xxgk/xg.htm" title="校歌" onfocus="undefined" onfocus="undefined">校歌</A> </LI>    
+</ul></div>
+<p></P>
+<div class="clear">
+
+
+
+
+
+<script language="javascript" src="/system/resource/js/ajax.js"></script><script language="javascript">_getBatchClickTimes('null',1645096081,'wbnews','u7')</script>
+<script>function seeContenta7(contentid,size,displayid){	document.getElementById(contentid).innerHTML = '[';	for(var i=0;i<=size;i++){		var allcontentid = contentid+(i+1);		if(allcontentid==displayid){			document.getElementById(contentid).innerHTML += " <span id='"+allcontentid+"' name='"+allcontentid+"'  >"+(i+1)+"</span> ";			document.getElementById(displayid).style.display = 'block';		}else{			document.getElementById(contentid).innerHTML += " <span style='cursor:pointer' id='"+allcontentid+"' name='"+allcontentid+"' onclick=seeContenta7('"+contentid+"','"+size+"','"+allcontentid+"')  >"+(i+1)+"</span> ";			document.getElementById(allcontentid).style.display = 'none';		}	}	document.getElementById(contentid).innerHTML += ']';}</script>
+<script language="javascript" src="/system/resource/js/news/mp4video.js"></script>
+<script>_addDynClicks('wbnews',1645096081,45218)</script>
+ 
+    <div id="vsb_content_45218_u71"><div id="vsb_content"><p class="vsbcontent_img"><img title="" alt="" src="/virtual_attach_file.vsb?afc=vnR76PM7UDMm-DL_RLDLNC8nmGDLRQFfUN7bM4VkMNnVnRL0gihFp2hmCIa0n1ysUYhRU1h2MlM2L7l8L8liLN7DnR9PL8LiLR-aM4l4L7rFMm-DnzCsoRAFMlQkMmUJqjfjo4OeosMsvdrFLmGYLkhXptQ0g47aLRL0MRlYLz9Jqd9nx&oid=1645096081&tid=1003&nid=45218&e=.jpg" border="0" vspace="0" hspace="0" vsbhref="vurl" vurl vheight="" vwidth="100%" orisrc="/virtual_attach_file.vsb?afc=vnR76PM7UDMm-DL_RLDLNC8nmGDLRQFfUN7bM4VkMNnVnRL0gihFp2hmCIa0n1ysUYhRU1h2MlM2L7l8L8liLN7DnR9PL8LiLR-aM4l4L7rFMm-DnzCsoRAFMlQkMmUJqjfjo4OeosMsvdrFLmGYLkhXptQ0g47aLRL0MRlYLz9Jqd9nx&oid=1645096081&tid=1003&nid=45218&e=.jpg" class="img_vsb_content" style="width:100%;"></p><p style="text-align:justify;">西南石油大学是新中国创建的第二所石油本科院校，是一所中央与地方共建、以四川省人民政府管理为主的高等学校。2013年，学校入选“国家中西部高校基础能力建设工程”，成为入选该工程的100所高校之一。2017年9月，入选国家首批“双一流”世界一流学科建设高校。2022年2月，入选国家第二轮“双一流”建设高校及建设学科名单。</p><p style="text-align:justify;">20世纪50年代中后期，我国石油工业相当落后，远远不能满足国家建设的需要，引起党和国家高度关注，毛泽东主席亲临四川隆昌气矿视察，中央政治局委员、中央政治局常务委员、中央书记处总书记邓小平亲自主持四川油气田勘探开发。1958年3月，位于南充东观、广安武胜、遂宁大英的三口探井喷出高产油流，震动全国，石油工业部部长余秋里将军坐镇南充，打响了川中石油大会战。为了加快开发四川石油天然气资源，也为西南协作区发展石油天然气工业培养技术干部，国家决定成立第二所石油高校，校址就设在川中石油会战指挥部所在地川北重镇南充市。</p><p style="text-align:justify;">1958年8月，石油工业部先期在成都招收643名首届学生，随后委派基建司司长马载同志率领一批年轻专家和干部职工奔赴南充，筹划学院的创建工作。9月20日，石油工业部会同教育部报经国务院同意，正式批准成立四川石油学院。从此，学校伴随着我国石油天然气工业的建设发展，开始了先有学生后建学校的破常规办学实践。</p><p style="text-align:justify;">1970年7月，学校经国务院批准更名为西南石油学院。2000年3月，学校划转四川省，由中央与地方共建、以四川省人民政府管理为主。2003年经教育部批准，学校升格为大学，2005年12月正式更名为西南石油大学。2018年11月1日，四川省人民政府、中国石油天然气集团有限公司、中国石油化工集团有限公司、中国海洋石油集团有限公司共同签署了共建世界一流学科建设高校（西南石油大学）战略合作框架协议。</p><p style="text-align:justify;">学校1978年开始招收硕士研究生，1986年获得博士学位授予权，1988年油气田开发工程（联合石油机械工程）成为首批国家重点学科，1989年油气藏地质及开发工程国家重点实验室获批建设，1991年设立博士后科研流动站。</p><p style="text-align:justify;">经过60多年的建设，学校现已发展成为一所以工为主、多学科协调发展、石油天然气优势突出和特色鲜明的大学，石油主干学科专业在全国处于领先水平。</p><p style="text-align:justify;">学校建有成都、南充两大校区，校园总面积3000余亩。共有15个学院、1个工程训练中心。学科专业涵盖理学、工学、管理学、经济学、文学、法学、教育学、艺术学、交叉学科9个学科门类，本科具有招生资格专业74个（其中2025年本科招生专业71个），16个专业通过工程教育专业认证。获批国家级一流本科专业建设点28个，国家特色专业8个，获批省级一流本科专业建设点15，四川省特色专业16个。建设国家级教学基地平台中心22个，包括“梦溪·泛舟”未来学习中心、国家级创新创业学院、天然气现代产业学院、国家实验教学示范中心3个、国家虚拟仿真实验教学中心2个、国家大学生校外实践教育基地2个、国家大学生文化素质教育基地、国家级众创空间（石大帮创）、全国高校实践育人创新创业基地、全国高校毕业生就业能力培训基地、计算机课程虚拟教研室等。学校获省部级及以上教学成果奖励133项，其中获国家教学成果和教材奖15项（一等奖5项）。现有国家级一流课程35门，省级一流课程118门。</p><p style="text-align:justify;">学校在全国本科院校教师教学发展指数榜单中的排名从2019年第106位提升至2023年第74位，在已发布的4期“全国高校教师教学竞赛状态数据”榜单中，均位列全国前十，是进入前十的唯一省属高校。2010年以来学校教师主编出版各类教材460余部，获首届全国教材建设奖优秀教材二等奖1部，获国家级精品教材1部，累计入选国家级规划教材22部、四川省规划教材62部。</p><p style="text-align:justify;">在中国高等教育学会发布的2022全国普通高校大学生竞赛榜单（本科）中，位列全国第10名，是进入前10的唯一省属高校。其中，2016年以来，在中国国际“互联网+”大学生创新创业大赛中，获金奖6项、银奖32项、铜奖52项。2001年，学校接受教育部本科教学工作随机性水平评估，结论为优秀。2008年，学校接受教育部本科教学工作水平评估，再次被评为“优秀”。2018年与2023年，学校顺利完成教育部本科教学工作审核评估与本科教育教学审核评估，受到专家组和四川省教育厅一致肯定。</p><p style="text-align:justify;">西南石油大学是国家建设高水平大学公派研究生项目高校。目前，学校共有研究生导师1241人，其中博士生导师235人（其中校外博导54人），硕士生导师1006人。有一级学科博士学位授权点7个，专业学位博士点1个，二级学科博士学位授权点37个，一级学科硕士学位授权点24个，二级学科硕士学位授权点95个，自主设置能源类交叉学科博士学位授权点8个、硕士学位授权点1个，硕士专业学位授权类别15个，硕士专业学位领域32个。</p><p>有5个博士后科研流动站，一级学科国家重点学科1个（涵盖3个二级学科国家重点学科），省部级重点学科15个。石油与天然气工程一级学科在全国学科评估中被评为A+，工程学、化学、材料学、地球科学、环境/生态学、计算机科学6个学科进入ESI全球前1%行列。石油与天然气工程博士后科研流动站在 2020 年度和 2025 年度全国博士后科研流动站评估中，连续两次被评为 “全国优秀博士后科研流动站”。</p><p style="text-align:justify;">学校现有在校学生42350人（含非全日制统招硕士研究生、非全日制统招博士研究生和留学生），其中普通本科生31665人，统招硕士研究生9051人，博士研究生1125人，国际学生509人。建校以来，学校为国家培养了25万余名毕业生。学校毕业生思想素质好、团队精神强，扎根基层、踏实肯干、基础扎实、勇于创新、上手快、后劲足、业绩突出，受到用人单位广泛赞誉。他们之中涌现出了一大批杰出的科技专家、教授、学者，一大批各级党政领导干部、优秀企业家和各条战线的技术和管理骨干。</p><p style="text-align:justify;">学校现有教职工2813人，有正高级专业技术职务人员394人，副高级专业技术职务人员709人。教职工入选国家和省部级专业技术人才700余人次，其中，中国工程院院士1人，德国工程院院士1人，中国两院院士增选有效候选人3人，全国杰出专业技术人才1人，国家自然科学基金青年科学基金A类和B类项目（含海外）获得者14人次，“长江学者奖励计划”入选者17人，国家“万人计划”入选者9人，省“塔尖”人才培养工程人选2人，四川杰出人才奖获得者1人，“新世纪百千万人才工程”国家级人选14人，享受国务院政府特殊津贴专家72人，教育部新世纪优秀人才支持计划入选者7人，全国文化名家暨“四个一批”人才工程人选1人，孙越崎能源大奖获得者4人、青年科技奖获得者20人，“天府青城计划”杰出科学家4人、领军人才12人、青年人才17人，“天府峨眉计划”顶尖人才1人、领军人才36人、青年人才70人，省学术和技术带头人74人、省学术和技术带头人后备人选250人，省“杰青”项目获得者36人次，省部级有突出贡献的优秀专家66人，自然资源部高层次科技创新人才科技领军人才2人、青年人才7人，四川省天府学者特聘专家7人。教职工获重要荣誉称号100余人次，其中，全国高校黄大年式教师团队3个，全国教育系统先进集体1个，全国先进工作者2人，全国模范教师1人，全国优秀教师6人，全国师德先进个人1人，全国优秀教育工作者1人，全国教材建设奖先进个人1人，获全国“五一”劳动奖章1人，国家通用语言文字推广普及先进个人1人，省“最美教师”2人，省“四有”好老师2人，省教书育人名师4人，省优秀教师9人，省教学名师9人，省优秀教育工作者1人，省“最美科技工作者”1人，省师德标兵3人，省师德楷模1人，省“五一”劳动奖章5人。</p><p style="text-align:justify;">学校把握科技自立自强、高质量发展新形势，聚焦国家能源重大战略领域，油气并举，气为特色，强势保持学校在常规石油天然气领域的传统优势，同时加强深地深海、页岩油气、天然气水合物、CCUS、非常规、新能源等前沿领域研究。开展基础性、前瞻性、非共识、高风险、颠覆性科技工作，承担高级别国家战略科技任务，实现了一系列前瞻性基础研究、引领性原创成果重大突破。《泰晤士高等教育2022年度世界大学影响力榜单》“产业、创新和基础设施”单项全球排名101-200位。</p><p style="text-align:justify;">学校现有省级及以上科技创新团队41个。其中：2个教育部“长江学者和创新团队发展计划”(培育)团队，18个四川省青年科技创新研究（含培育）团队、创新研究群体，2个四川省社会科学高水平研究团队，其他省级创新团队19个。</p><p style="text-align:justify;">现有国家级、部省级各类科技创新基地（平台）81个。其中：全国重点实验室2个（油气藏地质及开发工程全国重点实验室、海洋天然气水合物全国重点实验室），其他国家级平台18个（含国家工程实验室、国家工程技术研究中心、研发中心、应用数学中心等）；国际科技合作基地（平台、中心、实验室等）6个；部省级平台50个（含高等学校学科创新引智基地，教育部重点实验室、协同创新中心、工程研究中心，科技资源共享服务平台等）；四川省哲学社会科学（重点、科普）研究基地（实验室）5个；与中国石油集团创建全国首个“央企-高校”创新联合体，构建新型产学研用科技创新模式。</p><p style="text-align:justify;">“十二五”以来，承担国家自然科学基金、国家重点研发计划、国家科技重大专项以及科技部、四川省、成都市等各级各类自然科学纵向项目4870项；国家社科基金，教育部，四川省规划、科技厅软科学等人文社会科学类纵向项目2734项，其中国家社科基金重大项目1项，与企事业单位签订横向合作项目12419项；获得包括国家科技进步特等奖、国家科技进步一等奖、国家技术发明二等奖、国家科技进步二等奖在内的省部级以上政府奖、社会力量奖881项；发表论文42728篇，出版著作834部；授权专利12578件，位列省属高校第1位，其中发明专利6886件，实用新型(含外观设计)专利5692件；获中国专利奖4项，并列全国双一流大学第38位，四川省第2位。2024年学校新增项目合同经费10.34亿，实到科研经费9.5亿元。</p><p style="text-align:justify;">学校积极服务国家经济社会发展，深入贯彻落实脱贫攻坚和乡村振兴决策部署，2018-2023连续6年获四川省定点帮扶先进单位，定点帮扶工作案例6次入选教育部评选的全国省属高校精准帮扶典型项目。学校积极发挥科研优势服务国家重大战略需求，牵头成立四川省页岩气产业发展研究院。深度参与碳中和天府永兴实验室建设，负责清洁低碳能源技术研究部，以双一流学科顶尖科研团队为核心，联合参建高校组建了“天然气绿色开发利用”“零碳能源系统”“水风光储智慧能源”3个研究中心。学校拥有国家大学科技园，是西部地区唯一以石油天然气为特色的国家大学科技园。建有国家技术转移示范机构、国家级科技企业孵化器等5个国家级和7个省级创新创业平台；获批全国技术合同登记机构；科技园依托西南石油大学的科技资源优势及西部地区资源优势，建成了以石油勘探开发、石油装备、石油化工等核心技术领域为主，集新能源、新材料、电子信息技术与办公服务等为一体的科技成果转化基地，高新技术企业孵化基地，创新创业人才的聚集和培育基地。学校与成都市共同打造“环西南石油大学能源科技经济圈”，在成都市建有科技交流中心，在天府新区建有天府新能源研究院。学校坚持开放办学，重视国际交流与合作，已与美、俄、英、德、日、法、加等20多个国家和地区的高等院校和相关学术研究机构建立了密切的交流与合作关系。</p><p style="text-align:justify;">学校一直以来高度重视党建和思想政治工作，多次被评为四川省先进基层党组织和党建思想政治工作先进集体。获评四川省党建示范校、四川省“三全育人”综合改革试点高校（首批）等示范创建项目25项，获批全国立德树人机制综合改革试点院系2个、全国党建标杆院系1个、样板支部9个、“双带头人”教师党支部工作室1个、“双带头人”教师党支部书记“强国行”专项行动团队2个、百个研究生样板党支部2个，获批全国高校思想政治工作精品项目、全国高校示范“一站式”学生社区、全国学生综合素质训练基地等思想政治工作综改项目9项，多人获得全国优秀党务工作者、全国高校网络教育名师、全国高校辅导员年度人物、全国最美大学生、四川省优秀党务工作者、四川省杰出英才、四川省高校思想政治工作中青年骨干等省部级以上表彰。</p><p style="text-align:justify;">建校以来，学校坚持以不断提高育人质量为核心，以不断深化内部管理体制改革为动力，以富有特色的党建和思想政治工作为根本保证，各项工作蒸蒸日上。学校获得“全国文明校园”“全国五一劳动奖状”“全国高校毕业生就业50强”“全国普通高等学校优秀教务处”“全国学位与研究生教育管理工作先进集体”“全国普通高等学校科技管理先进集体”“全国普通高等学校毕业生就业工作先进集体”“全国模范职工之家”“全国学生军事训练工作先进单位”“全国贯彻《学校体育工作条例》优秀高等学校”“全国引进国外智力先进单位”“全国学校及周边治安综合治理工作先进集体”“全国大中专学生志愿者暑期三下乡社会实践活动先进单位”“全国深化创新创业教育改革示范高校”“全国高校实践育人创新创业基地”“全国创新创业典型经验高校50强”等称号。2019年，学校马克思主义学院入选四川省第二批重点马克思主义学院。2010年，《西南石油大学学报（自然科学版）》获得“教育部中国高校优秀科技期刊奖”（第三届）。</p><p style="text-align:justify;">今日的西南石油大学将继续秉承“实事求是，艰苦奋斗”的优良传统，弘扬“为祖国加油，为民族争气”的精神，践行“明德笃志，博学创新”的校训，实施“质量立校，人才强校，学术兴校，突出特色，科学发展”的发展战略，全面深化改革，为建成以工为主，石油天然气及其相关学科世界一流、多学科协调发展的一流能源大学和百年名校奠定坚实基础而不懈奋斗！</p><p><br></p><p><br></p><p class="vsbcontent_end" style="text-align:right;">更新时间：2026年10月20日</p></div></div>
+    <br />
+    <span id="vsb_content_45218_u7" name="vsb_content_45218_u7"></span><br /><br />
+    
+    
+
+</div>
+   </div>
+  </div>
+</div>
+ 
+ 
+</div>
+ 
+<!-- ################################################################################################ -->
+<!--尾部 版权开始-->
+<div id="copyright">
+<div id="copycontent"><!-- 版权内容请在本组件"内容配置-版权"处填写 -->
+<p><img width="19" height="17" src="../images/bqimg/4.png" style="width:19px;height:17px;white-space:normal;" />四川省成都市新都区新都大道8号&nbsp;610500&nbsp;&nbsp; <img width="20" height="20" src="../images/bqimg/3.png" style="width:20px;height:20px;" />&nbsp;学校党政办电话&nbsp;028-83032308&nbsp; | &nbsp;<img width="19" height="17" src="../images/bqimg/4.png" style="width:19px;height:17px;white-space:normal;" />&nbsp; 四川省南充市顺庆区油院路二段1号 &nbsp;637001&nbsp;&nbsp;&nbsp;&nbsp;<img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />南充校区电话&nbsp; 0817-2641016&nbsp; | &nbsp; <img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />本科生招生 028-83032224 &nbsp; | &nbsp;<img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />本科生教务 028-83032113&nbsp;</p><p><img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />研究生招生 028-83032120 &nbsp;&nbsp; | &nbsp;<img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />研究生教务 028-83032109/83032175 &nbsp; | &nbsp; <img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />成教招生 028-83035715 &nbsp; | &nbsp;<img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />自考招生 028-83035720&nbsp; | &nbsp; <img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />成教教务 028-83035714 &nbsp; | &nbsp;<img width="16" height="16" src="../images/bqimg/6.png" style="width:16px;height:16px;white-space:normal;" />自考考务考籍 028-83035716</p></div></div><!--尾部 版权结束-->
+
+<script src="../js/jquery.min.js"></script> 
+<script src="../js/menumaker.js"></script> 
+
+</body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

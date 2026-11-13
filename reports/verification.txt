@@ -1,0 +1,73 @@
+2026-11-12  |  P:\SWPURAG  |  Python 3.7.0
+全部为离线命令。更新时间及引文另与保留的原始 HTML 核对。
+
+> python -B -m swpurag import
+{"status": "new", "url": "https://www.swpu.edu.cn/xqzl/xxgk.htm", "document_id": 1, "version_id": 1, "attempt_id": 1, "chunk_count": 22}
+{"status": "new", "url": "https://www.swpu.edu.cn/info/1312/42168.htm", "document_id": 2, "version_id": 2, "attempt_id": 2, "chunk_count": 51}
+{"status": "new", "url": "https://www.swpu.edu.cn/sgy/szdw/jsml/hyyq/fjs/gy.htm", "document_id": 3, "version_id": 3, "attempt_id": 3, "chunk_count": 67}
+exit 0
+
+> python -B -m swpurag stats
+{"sources": 3, "documents": 3, "versions": 3, "chunks": 140, "attempts": 3, "failed_attempts": 0}
+exit 0
+
+> python -B -m swpurag import
+{"status": "unchanged", "url": "https://www.swpu.edu.cn/xqzl/xxgk.htm", "document_id": 1, "version_id": 1, "attempt_id": 4, "chunk_count": 22}
+{"status": "unchanged", "url": "https://www.swpu.edu.cn/info/1312/42168.htm", "document_id": 2, "version_id": 2, "attempt_id": 5, "chunk_count": 51}
+{"status": "unchanged", "url": "https://www.swpu.edu.cn/sgy/szdw/jsml/hyyq/fjs/gy.htm", "document_id": 3, "version_id": 3, "attempt_id": 6, "chunk_count": 67}
+exit 0
+
+> python -B -m swpurag stats
+{"sources": 3, "documents": 3, "versions": 3, "chunks": 140, "attempts": 6, "failed_attempts": 0}
+exit 0
+
+> python -B -m swpurag search "成都 南充 校区" --limit 1
+[1] 学校概况（西南石油大学门户网站）
+原文 学校建有成都、南充两大校区，校园总面积3000余亩。共有15个学院、1个工程训练中心。学科专业涵盖理学、工学、管理学、经济学、文学、法学、教育学、艺术学、交叉学科9个学科门类，本科具有招生资格专业74个（其中2025年本科招生专业71个），16个专业通过工程教育专业认证。获批国家级一流本科专业建设点28个，国家特色专业8个，获批省级一流本科专业建设点15，四川省特色专业16个。建设国家级教学基地平台中心22个，包括“梦溪·泛舟”未来学习…
+来源 https://www.swpu.edu.cn/xqzl/xxgk.htm
+正文块 7 · HTML 第 371 行第 1889 列
+定位 #vsb_content > p:nth-of-type(8)
+原件 raw/4cdcd1519fb7323f13f044db3185d6739391b9f55a4461f684158f0600734617.html · 版本 1 · 抓取 2026-11-12T14:21:20+08:00
+exit 0
+
+> python -B -m swpurag search 集中征集期 --limit 1
+[1] 关于迎接建校70周年校庆全面征集校史实物史料的公告（档案馆）
+原文 集中征集期：本公告发布之日起至2028年6月30日。
+来源 https://www.swpu.edu.cn/info/1312/42168.htm
+正文块 42 · HTML 第 145 行第 41457 列
+定位 #vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(32)
+原件 raw/8caccdacaf4360038e71a068d7b6abc7bffbf5f4e2c2855684cbbcd0fe908d6b.html · 版本 2 · 抓取 2026-11-12T14:21:26+08:00
+exit 0
+
+> python -B -m swpurag search "高岳 海洋工程流动安全" --limit 1
+[1] 高岳（石油与天然气工程学院）
+原文 高岳，博士（后），副研究员，2021年毕业于西南石油大学海洋油气工程专业，获工学博士学位，长期从事海洋工程流动安全与控制、油气储运工程中的复杂多相流动等方面的研究工作。主持国家自然科学基金青年基金项目1项、省级青年基金项目1项、四川省博士后特别资助项目1项。作为骨干研究人员参与了国家自然科学基金面上项目、青年基金项目、四川省科技基金项目及国家重点实验室开放基金项目6项。在Energy，Physics of Fluids，Journal …
+来源 https://www.swpu.edu.cn/sgy/szdw/jsml/hyyq/fjs/gy.htm
+正文块 5 · HTML 第 478 行第 1 列
+定位 .sub-right-con > div:nth-of-type(2) > p:nth-of-type(1)
+原件 raw/fdc3081ec997b12d9d1cfeb2ed93b2a8fcad066e1883ea7a37251914e7c36a8c.html · 版本 3 · 抓取 2026-11-12T14:21:34+08:00
+exit 0
+
+> python -B -m swpurag search "高岳 纽卡斯尔大学" --limit 1
+[1] 高岳（石油与天然气工程学院）
+原文 ●2024.02－2025.01 英国纽卡斯尔大学（Newcastle University，UK）工程学院（School of Engineering），访问学者（国家公派）
+来源 https://www.swpu.edu.cn/sgy/szdw/jsml/hyyq/fjs/gy.htm
+正文块 13 · HTML 第 492 行第 1 列
+定位 .sub-right-con > div:nth-of-type(3) > div:nth-of-type(2) > p:nth-of-type(8)
+原件 raw/fdc3081ec997b12d9d1cfeb2ed93b2a8fcad066e1883ea7a37251914e7c36a8c.html · 版本 3 · 抓取 2026-11-12T14:21:34+08:00
+exit 0
+
+> python -B -m swpurag search "图书馆 闭馆时间" --limit 1
+未找到符合关键词的原文证据。
+exit 0
+
+> python -B -m unittest discover -s tests -v
+test_duplicate_content_and_update_keep_version_history (test_lifecycle.ImportLifecycleTest) ... ok
+test_failures_preserve_current_evidence (test_lifecycle.ImportLifecycleTest) ... ok
+test_public_pages_have_checkable_citations (test_lifecycle.ImportLifecycleTest) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.468s
+
+OK
+exit 0

@@ -1,0 +1,126 @@
+[
+  {
+    "url": "https://www.swpu.edu.cn/xqzl/xxgk.htm",
+    "fetched_at": "2026-11-12T14:21:20+08:00",
+    "final_url": "https://www.swpu.edu.cn/xqzl/xxgk.htm",
+    "http_status": 200,
+    "charset": null,
+    "raw_sha256": "4cdcd1519fb7323f13f044db3185d6739391b9f55a4461f684158f0600734617",
+    "raw_path": "raw/4cdcd1519fb7323f13f044db3185d6739391b9f55a4461f684158f0600734617.html"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/info/1312/42168.htm",
+    "fetched_at": "2026-11-12T14:21:26+08:00",
+    "final_url": "https://www.swpu.edu.cn/info/1312/42168.htm",
+    "http_status": 200,
+    "charset": null,
+    "raw_sha256": "8caccdacaf4360038e71a068d7b6abc7bffbf5f4e2c2855684cbbcd0fe908d6b",
+    "raw_path": "raw/8caccdacaf4360038e71a068d7b6abc7bffbf5f4e2c2855684cbbcd0fe908d6b.html"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/sgy/szdw/jsml/hyyq/fjs/gy.htm",
+    "fetched_at": "2026-11-12T14:21:34+08:00",
+    "final_url": "https://www.swpu.edu.cn/sgy/szdw/jsml/hyyq/fjs/gy.htm",
+    "http_status": 200,
+    "charset": null,
+    "raw_sha256": "fdc3081ec997b12d9d1cfeb2ed93b2a8fcad066e1883ea7a37251914e7c36a8c",
+    "raw_path": "raw/fdc3081ec997b12d9d1cfeb2ed93b2a8fcad066e1883ea7a37251914e7c36a8c.html"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/gs/info/1073/8520.htm",
+    "fetched_at": "2026-11-12T15:29:04+08:00",
+    "final_url": "https://www.swpu.edu.cn/gs/info/1073/8520.htm",
+    "http_status": 200,
+    "charset": null,
+    "raw_sha256": "ed71d935b89cd23e6ffd62626b6bc354a74dee14307b18da14eac2548e18f230",
+    "raw_path": "raw/ed71d935b89cd23e6ffd62626b6bc354a74dee14307b18da14eac2548e18f230.html"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/gs/info/1074/8660.htm",
+    "fetched_at": "2026-11-12T15:29:14+08:00",
+    "final_url": "https://www.swpu.edu.cn/gs/info/1074/8660.htm",
+    "http_status": 200,
+    "charset": null,
+    "raw_sha256": "ee4de34d74bd80c3cee241e39b962855cdf0671a50cc9101d5c82e54afd877e0",
+    "raw_path": "raw/ee4de34d74bd80c3cee241e39b962855cdf0671a50cc9101d5c82e54afd877e0.html"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/gs/info/1074/8650.htm",
+    "fetched_at": "2026-11-12T15:29:23+08:00",
+    "final_url": "https://www.swpu.edu.cn/gs/info/1074/8650.htm",
+    "http_status": 200,
+    "charset": null,
+    "raw_sha256": "1b734cc864f976fdfbc821944d8ed67d971cdf337e2ba1fe7ab432a80eb632ff",
+    "raw_path": "raw/1b734cc864f976fdfbc821944d8ed67d971cdf337e2ba1fe7ab432a80eb632ff.html"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+    "fetched_at": "2026-11-12T19:13:15+08:00",
+    "final_url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JL4T0fUl-8LmGYoaRAkUlQ7MmvsUNMPkLRlbnzCZMmvDUll0gihFp2hmCIa0U1ysnkyiMkyio7n7ol-ZU4-soRrVL8U8oRQ2U4LaUNlbU4rFU4r7MmW7MlWFL87YM8LJv2nto4OeoD64gDTJQty0LzGsMkyZMzCagtA8pUYcc&oid=1400920763&tid=1074&nid=8560&e=.pdf",
+    "http_status": 200,
+    "content_type": "application/pdf",
+    "charset": null,
+    "raw_sha256": "1698135301cac7d50b5386fe0330a6965b8158238eec57c3696ed4ebea2805e3",
+    "raw_path": "raw/1698135301cac7d50b5386fe0330a6965b8158238eec57c3696ed4ebea2805e3.pdf"
+  },
+  {
+    "url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+    "fetched_at": "2026-11-12T20:07:56+08:00",
+    "final_url": "https://www.swpu.edu.cn/virtual_attach_file.vsb?afc=JMm60kMmV2LmU8UamM7nl74nRv8olLPiL4vbU8WfU4ffozN0gihFp2hmCIa0LSyDn1ybU1hkMzLinR6kL8C8oRnfollZnNUPol7ZLR9PM7WFLmLaLlCYn7nFM7rRMzLJv2nto4OeoD64gDTJQty0LzGsMkyZMzUagtA8pUYcc&oid=1400920763&tid=1074&nid=8540&e=.pdf",
+    "http_status": 200,
+    "content_type": "application/pdf",
+    "charset": null,
+    "raw_sha256": "c2e284441dfdfb8ae661e7c3662a21aaccb3be5bbf21038649d2ce885a43507f",
+    "raw_path": "raw/c2e284441dfdfb8ae661e7c3662a21aaccb3be5bbf21038649d2ce885a43507f.pdf"
+  },
+  {
+    "url": "https://lib.swpu.edu.cn/1858.80/marx/map.html",
+    "fetched_at": "2026-11-12T20:58:57+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1858.80/marx/map.html",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "83c36105dfb7e0dcb48b71ed32824aeba4931dfa3a8829c515b9430427174dcb",
+    "raw_path": "raw/83c36105dfb7e0dcb48b71ed32824aeba4931dfa3a8829c515b9430427174dcb.html"
+  },
+  {
+    "url": "https://lib.swpu.edu.cn/1858.80/marx/guide.html",
+    "fetched_at": "2026-11-12T20:59:14+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1858.80/marx/guide.html",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "d181ca9990948ba93e0f3e8ebd2db6f21470ea0907a5a7266ed84bf799b1a218",
+    "raw_path": "raw/d181ca9990948ba93e0f3e8ebd2db6f21470ea0907a5a7266ed84bf799b1a218.html"
+  },
+  {
+    "url": "https://lib.swpu.edu.cn/1858.80/marx/role_list.html?id=2",
+    "fetched_at": "2026-11-12T20:59:31+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1858.80/marx/role_list.html?id=2",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "dfa2c37670adb257f0cb1b644dc9df217ae47fdf3071c761bc6e6ad27a72d4cf",
+    "raw_path": "raw/dfa2c37670adb257f0cb1b644dc9df217ae47fdf3071c761bc6e6ad27a72d4cf.html"
+  },
+  {
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20261019.html",
+    "fetched_at": "2026-11-12T20:59:48+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1849.8080/noticex/20261019.html",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "3b8bd6329b4fab91e9ca6f3c0c8f7f87f67ebc7be12e6eb137f8489e77136eb9",
+    "raw_path": "raw/3b8bd6329b4fab91e9ca6f3c0c8f7f87f67ebc7be12e6eb137f8489e77136eb9.html"
+  },
+  {
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260710.html",
+    "fetched_at": "2026-11-12T21:00:05+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260710.html",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "957ed8c9ebb19c5fc19f0a07f19970e669ca79dffd49de5f45551b48b2231d01",
+    "raw_path": "raw/957ed8c9ebb19c5fc19f0a07f19970e669ca79dffd49de5f45551b48b2231d01.html"
+  }
+]
