@@ -4,9 +4,24 @@ import unittest
 from unittest.mock import patch
 
 from swpurag.answer import AnswerError, answer_question, validate_answer, validate_parts
+from swpurag.topics import topic_questions
 
 
 class AnswerTest(unittest.TestCase):
+    def test_mixed_subject_question_keeps_calendar_date_with_library(self):
+        questions = topic_questions("想报2027年计软学院全日制085404，第四科考啥？"
+                                    "另外2026年12月18日，成都总馆几点关门？")
+        self.assertEqual(list(questions), ["admissions", "library"])
+        self.assertIn("2027年", questions["admissions"])
+        self.assertIn("第四科考啥", questions["admissions"])
+        self.assertIn("2026年12月18日", questions["library"])
+        self.assertNotIn("2026年", questions["admissions"])
+        self.assertNotIn("2027年", questions["library"])
+
+    def test_library_reader_study_mode_does_not_route_to_admissions(self):
+        question = "我是全日制085404的研究生，成都总馆借的书能续几回？"
+        self.assertEqual(topic_questions(question), {"library": question})
+
     def test_only_quotes_from_this_request_are_accepted(self):
         evidence = [{"id": 1, "text": "收费标准\n24000 元"}]
         answer = {

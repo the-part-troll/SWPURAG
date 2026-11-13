@@ -153,8 +153,12 @@ def main():
     ask.add_argument("--limit", type=int, choices=range(1, 11), default=5)
     ask.add_argument("--retriever", choices=("scoped", "natural", "keyword"), default="scoped")
     ask.add_argument("--json", action="store_true", help="return the answer and all supplied evidence")
+    browser = commands.add_parser("serve", help="start the local browser demo on 127.0.0.1")
+    browser.add_argument("--port", type=int, default=8765)
     commands.add_parser("stats", help="show corpus and import counts")
     args = parser.parse_args()
+    if args.command == "serve" and not 1 <= args.port <= 65535:
+        parser.error("--port must be between 1 and 65535")
 
     db_path = args.db or args.data_dir / "corpus.sqlite3"
     try:
@@ -162,6 +166,10 @@ def main():
             db_path.parent.mkdir(parents=True, exist_ok=True)
         elif not db_path.is_file():
             raise ValueError("Corpus not found. Run import first: {}".format(db_path))
+        if args.command == "serve":
+            from .server import serve
+
+            return serve(db_path, args.data_dir, args.port)
         with Store(db_path) as store:
             if args.command in ("import", "fetch"):
                 return import_pages(store, args)

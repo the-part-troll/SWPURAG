@@ -62,6 +62,9 @@ LIBRARY_PROMPT = """
 library_scope 元数据中，发布日期不等于适用日期。临时开放只用于所标馆舍和含首尾的日期，
 晚间延长只说明晚间截止时间，不能据此推断借还窗口同步延长。常规开放须说明假日或临时调整
 以通知为准。公告只列某馆时不能推断其他馆开馆或闭馆。借期和续借次数必须匹配读者类别。
+同时问次数和操作时，各自引用读者规则和操作指南。有 loan_dates 时，以原到期日核对延期的
+适用区间，以计划归还日核对公告中的截止日期。写明所问日期是否落在免超期时段，引用公告，
+不要从超出公告时段推断罚金或其他未给出的处理规则。
 引文只抄 evidence.text 内的原文，不把 metadata 拼进引文。"""
 
 
@@ -188,7 +191,7 @@ def _retrieve_admissions(store, question, method, limit):
     return search_admission_question(store, question, limit, admission_year=ADMISSION_YEAR)
 
 
-def topic_evidence(store, question, method, limit):
+def topic_evidence(store, question, method, limit, *, ranker=None, trace=None):
     if limit < 1:
         raise ValueError("Search limit must be positive")
     questions = topic_questions(question)
@@ -196,9 +199,9 @@ def topic_evidence(store, question, method, limit):
     groups = []
     for topic, text in questions.items():
         if topic == "library":
-            hits, scope = search_library(store, text, limit)
+            hits, scope = search_library(store, text, limit, ranker=ranker, trace=trace)
         elif method == "scoped":
-            hits, scope = search_scoped(store, text, limit, ADMISSION_YEAR)
+            hits, scope = search_scoped(store, text, limit, ADMISSION_YEAR, ranker=ranker, trace=trace)
         else:
             hits, scope = _retrieve_admissions(store, text, method, limit), {}
         scopes[topic] = scope
@@ -208,6 +211,21 @@ def topic_evidence(store, question, method, limit):
 
 def retrieve(store, question, method, limit):
     return topic_evidence(store, question, method, limit)[0]
+
+
+def prepare_retrieval(store, question, method="scoped", limit=5, *, ranker=None, trace=None):
+    """Return the evidence and topic scopes used by ask, before model synthesis."""
+    question = question.strip()
+    if not question or len(question) > 1000:
+        raise ValueError("请提供 1 至 1000 个字符的问题")
+    if (ranker is not None or trace is not None) and method != "scoped":
+        raise ValueError("Alternative rankers and traces use the scoped candidate selection")
+    batches = [] if trace is not None else None
+    hits, questions, scopes = topic_evidence(store, question, method, limit, ranker=ranker, trace=batches)
+    evidence = evidence_with_context(store, hits)
+    if trace is not None:
+        trace.update(batches=batches, scopes=scopes, ranked_ids=[hit["chunk_id"] for hit in hits])
+    return evidence, questions, scopes
 
 
 def evidence_with_context(store, hits):
@@ -307,10 +325,7 @@ def synthesize(question, evidence, system_prompt=SYSTEM_PROMPT, subquestions=(),
 
 def answer_question(store, question, method="natural", limit=5):
     question = question.strip()
-    if not question or len(question) > 1000:
-        raise ValueError("请提供 1 至 1000 个字符的问题")
-    hits, questions, scopes = topic_evidence(store, question, method, limit)
-    evidence = evidence_with_context(store, hits)
+    evidence, questions, scopes = prepare_retrieval(store, question, method, limit)
     parts = {}
     for topic, text in questions.items():
         scope = scopes[topic]

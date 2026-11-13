@@ -67,6 +67,17 @@ class LibraryScopeTest(unittest.TestCase):
         self.assertTrue(any("进行续借操作" in hit["text"] for hit in hits))
         self.assertFalse(any("可续借1次" in hit["text"] for hit in hits))
 
+    def test_colloquial_renewal_count_is_separate_from_the_mobile_entry(self):
+        hits, scope = self.search("本科生在成都总馆借的书还能续上几回？在手机上去哪个入口？")
+        self.assertEqual(scope["reader_group"], "undergraduate")
+        self.assertEqual(
+            [(hit["locator"]["paragraph"], hit["locator"]["library_scope"]["loan_aspect"]) for hit in hits],
+            [(18, "renewal_method"), (2, "renewal_rule")],
+        )
+        hits, scope = self.search("成都总馆借的书，手机上到哪儿点续借？")
+        self.assertIsNone(scope["clarification"])
+        self.assertEqual([hit["locator"]["paragraph"] for hit in hits], [18])
+
     def test_public_hours_never_substitute_for_realtime_or_other_campus(self):
         for question in ("成都总馆今晚还剩多少个自习座位？", "南充分馆平时几点开？"):
             with self.subTest(question=question):
@@ -82,3 +93,14 @@ class LibraryScopeTest(unittest.TestCase):
         hits, scope = self.search("成都总馆平时几点开到几点，周日也能用自助借还机吗？")
         self.assertEqual(scope["date_source"], "regular")
         self.assertIn("所有开馆时间提供自动借还仪借还服务", hits[0]["text"])
+
+    def test_colloquial_regular_hours_do_not_mask_an_extension(self):
+        hits, scope = self.search("明辨楼 F 区的图书馆平常几点关门？")
+        self.assertEqual(scope["date_source"], "regular")
+        self.assertEqual([hit["locator"]["paragraph"] for hit in hits], [23])
+        hits, scope = self.search("听说成都二期图书馆比平常多开一会，晚上还能待到几点？")
+        self.assertFalse(hits)
+        self.assertIn("哪一天", scope["clarification"])
+        hits, scope = self.search("12月18日成都二期图书馆会不会比平常晚关门？")
+        self.assertEqual(scope["notice_kind"], "temporary")
+        self.assertIn("22:30", hits[0]["text"])

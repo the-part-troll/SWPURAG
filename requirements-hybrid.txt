@@ -1,0 +1,6 @@
+# Optional retrieval experiment; install torch==2.8.0+cpu from PyTorch's CPU index first.
+transformers==4.57.6
+numpy==1.26.4
+huggingface-hub==0.36.2
+tokenizers==0.22.2
+safetensors==0.8.0

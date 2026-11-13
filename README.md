@@ -34,11 +34,32 @@ python -B -m swpurag ask "计算机与软件学院全日制085404初试第四门
 
 [图书馆与跨主题评测](reports/library-evaluation.md) · [图书馆来源清单](reports/library-sources.md) · [双目录范围对照](reports/admissions-catalog-scope.md) · [招生来源清单](reports/admissions-sources.md)
 
+## 本地浏览器演示
+
+在项目目录激活 `SWPU_RAG`，按上方方式为当前终端配置模型。如果本地样本库还未建立，先运行 `python -B -m swpurag import`。
+
+```powershell
+Set-Location 'P:\SWPURAG'
+conda activate SWPU_RAG
+python -B -m swpurag serve --port 8765
+```
+
+打开 [http://127.0.0.1:8765/](http://127.0.0.1:8765/)。服务只监听本机。在启动终端按 `Ctrl+C` 停止；端口已占用时可换一个端口，并使用对应地址。
+
+页面复用 `ask` 默认的范围检索和 Top 5 预算。点击答案中的编号可跳到对应证据，再打开官网或本地原件。HTML 存档会跳到段落起始行；PDF 会跳到文件页码，表格行号显示在证据卡上。跨主题问题分开显示回答、澄清和证据缺口。模型凭据留在服务端进程；生成时会把问题和命中的公开证据发往配置的模型服务。
+
+[浏览器实测与命令行对照](reports/local-browser-demo.md)
+
+词法、中文向量与 RRF 的检索对照见 [首轮混合检索报告](reports/hybrid-retrieval.md)，含冻结题、逐题排名和本地索引重建命令。浏览器仍使用现有词法检索。
+
+常规开放、口语招生问句、续借和延期归还的修复结果见 [主题路由与证据筛选复审](reports/routing-regression.md)。
+
 ## 工作区
 
 | 位置 | 用途 |
 | --- | --- |
 | `swpurag/` | 命令行、原件归档、解析与导入、基线与自然问句检索、模型回答及评测 |
+| `swpurag/web/` | 本地问答页面、引文和来源展示 |
 | `samples/pages.json` | 十三个明确的 URL、正文校验，以及招生、图书馆适用信息 |
 | `samples/captures.json` | 实际抓取记录，包括 URL、HTTP 状态、抓取时间、原件相对路径和 SHA-256 |
 | `data/raw/` | 官网响应的原始 HTML 和 PDF 字节。按 SHA-256 命名，Git 保留字节级换行 |

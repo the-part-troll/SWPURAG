@@ -1,0 +1,112 @@
+[
+  {
+    "id": "R01",
+    "question": "成都一期图书馆平常早上几点开门，晚上几点清场？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "required": [
+      {"label": "一期总馆常规开放时间为 8:00–22:00，临时安排以公告为准", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 1}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6}
+    ]
+  },
+  {
+    "id": "R02",
+    "question": "听说成都二期图书馆这阵子会比平常多开一会，最晚能待到几点呀？",
+    "expected_topics": ["library"],
+    "expected_status": "clarify",
+    "required": [],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 1},
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "「比平常多开一会」语义是临时调整，日期不清；常规时段和临时通知都不能直接当成所问日期的依据。"
+  },
+  {
+    "id": "R03",
+    "question": "2026年11月15日成都二期图书馆晚上几点关门？另外，2027年计算机与软件学院全日制085404，第四科考啥呀？",
+    "expected_topics": ["library", "admissions"],
+    "expected_status": "evidence",
+    "required": [
+      {"label": "11 月 15 日处于成都分馆延时区间，关门时间为 22:30", "alternatives": [{"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}]},
+      {"label": "计算机与软件学院全日制 085404 的第四门为 408 计算机学科专业基础", "alternatives": [{"sample": "masters-full-time-directory-2027", "page": 6, "row": 22}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 1},
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-summer-schedule"},
+      {"sample": "masters-part-time-directory-2027"}
+    ]
+  },
+  {
+    "id": "R04",
+    "question": "我是研究生，成都总馆那本借的书最多能续上几回？手机里从哪个入口办续借？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "required": [
+      {"label": "研究生图书可续借 2 次，每次 30 天", "alternatives": [{"sample": "library-chengdu-loan-rights", "paragraph": 5}]},
+      {"label": "续借可用「我的图书馆」或「移动图书馆」", "alternatives": [{"sample": "library-chengdu-reader-guide", "paragraph": 18}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-loan-rights", "paragraph": 2},
+      {"sample": "library-chengdu-loan-rights", "paragraph": 8}
+    ],
+    "notes": "研究生在此是读者身份。"
+  },
+  {
+    "id": "R05",
+    "question": "借了成都总馆的书，手机上到哪儿点续借？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "required": [
+      {"label": "续借可用「我的图书馆」或「移动图书馆」", "alternatives": [{"sample": "library-chengdu-reader-guide", "paragraph": 18}]}
+    ],
+    "wrong_scope": [],
+    "notes": "只问操作入口，无需追问读者身份；未声称某类读者不能使用指南。"
+  },
+  {
+    "id": "R06",
+    "question": "我准备2026年9月7日去成都总馆还书，那本书原本8月26日到期。按暑期的延期规定，这样还会超期吗？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "required": [
+      {"label": "8 月 26 日落在延期适用范围；9 月 7 日超过通知规定的 9 月 6 日截止日", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 12}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "先提计划归还日，再提原到期日；只判定超过通知免超期的截止日期，不推断扣费或续借。"
+  },
+  {
+    "id": "R07",
+    "question": "成都总馆这本书原到期日我记不清了，可能是2026年7月10日到期，也可能是7月12日到期；打算9月6日还，暑期延期算不算我这本？",
+    "expected_topics": ["library"],
+    "expected_status": "clarify",
+    "required": [],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "两个候选到期日跨过公告起点，需确认原到期日。延期通知正文可作为澄清的背景。"
+  },
+  {
+    "id": "R08",
+    "question": "我人在南充校区，那边的图书馆平常晚上几点关门呀？",
+    "expected_topics": ["library"],
+    "expected_status": "insufficient",
+    "required": [],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours"},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2026-summer-schedule"}
+    ],
+    "notes": "现有成都馆舍的开放证据不能用于南充校区。"
+  }
+]

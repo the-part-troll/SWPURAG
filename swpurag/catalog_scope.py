@@ -2,7 +2,7 @@
 
 import re
 
-from .retrieval import explicit_subquestions, search_admission_question, search_natural
+from .retrieval import explicit_subquestions, rank_candidates, search_admission_question
 from .store import _search_text
 
 
@@ -97,7 +97,7 @@ def _pair_comparison(query, targets, colleges):
     return targets
 
 
-def search_scoped(store, question, limit, admission_year):
+def search_scoped(store, question, limit, admission_year, *, ranker=None, trace=None):
     """Return ranked evidence and any missing scope that changes the answer."""
     query = _compact(question)
     rows = [row for row in store.current_chunks() if row.get("admission_year") == admission_year]
@@ -167,20 +167,25 @@ def search_scoped(store, question, limit, admission_year):
         if compare_modes:
             for mode in modes:
                 subset = [row for row in targets if _mode(row) == mode]
-                reserved.extend(search_natural(store, question, 1, admission_year, subset))
+                reserved.extend(rank_candidates(store, question, 1, admission_year, subset,
+                                                ranker=ranker, trace=trace, stage="reserved_mode"))
         elif comparison and len(colleges) > 1:
             for college in colleges:
                 subset = [row for row in targets if _college(row) == college]
-                reserved.extend(search_natural(store, question, 1, admission_year, subset))
+                reserved.extend(rank_candidates(store, question, 1, admission_year, subset,
+                                                ranker=ranker, trace=trace, stage="reserved_college"))
         elif fields:
-            reserved.extend(search_natural(store, question, 1, admission_year, targets))
+            reserved.extend(rank_candidates(store, question, 1, admission_year, targets,
+                                            ranker=ranker, trace=trace, stage="reserved_directory"))
 
         if _POLICY.search(query):
             policy_rows = [row for row in pool if row.get("role") != "admission_directory"]
             policy_query = next((part for part in explicit_subquestions(question) if _POLICY.search(part)), question)
-            reserved.extend(search_natural(store, policy_query, 1, admission_year, policy_rows))
+            reserved.extend(rank_candidates(store, policy_query, 1, admission_year, policy_rows,
+                                            ranker=ranker, trace=trace, stage="reserved_policy"))
 
-    hits = search_admission_question(store, question, limit, admission_year, pool, reserved)
+    hits = search_admission_question(store, question, limit, admission_year, pool, reserved,
+                                     ranker=ranker, trace=trace)
     scope = {"study_modes": list(modes), "colleges": colleges, "program_codes": codes,
              "compare_modes": compare_modes, "special_exam": special_exam}
     if clarify:

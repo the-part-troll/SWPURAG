@@ -73,6 +73,18 @@ def _query_clauses(query):
     return clauses
 
 
+def _cohort_rows(rows, query, admission_year, explicit_years):
+    # 招生届次限定候选文档，报考日期中的年份仍可参与排序。
+    cohort_years = explicit_years - set(_DATED_YEAR.findall(_search_text(query)))
+    for row in rows:
+        year = row.get("admission_year")
+        if admission_year is not None and str(year) != str(admission_year):
+            continue
+        if year is not None and cohort_years and str(year) not in cohort_years:
+            continue
+        yield row
+
+
 def _supported_terms(clauses, doc_terms, years, shared_context):
     """Keep each clause's observed terms after checking explicit year scope."""
     supported = set()
@@ -123,10 +135,7 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
         return []
     # 改写后的词组可能只剩单字相同，单字仅辅助排序。入选仍需命中整词或相邻两字。
     single_han = {char for term in query_terms for char in term if _HAN_CHAR.fullmatch(char)}
-    # 招生届次限定候选文档，报考日期中的年份仍作为正文检索词。
     explicit_years = {term for term in query_terms if _YEAR.fullmatch(term)}
-    dated_years = set(_DATED_YEAR.findall(_search_text(query)))
-    cohort_years = explicit_years - dated_years
     query_words = {word for clause in clauses for word in clause}
 
     blocks = []
@@ -134,12 +143,8 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
     title_terms = {}
     unit_terms = []
     frequencies = Counter()
-    for row in store.current_chunks() if rows is None else rows:
-        year = row.get("admission_year")
-        if admission_year is not None and str(year) != str(admission_year):
-            continue
-        if year is not None and cohort_years and str(year) not in cohort_years:
-            continue
+    pool = store.current_chunks() if rows is None else rows
+    for row in _cohort_rows(pool, query, admission_year, explicit_years):
         body_words = _words(row["text"])
         counts = _counts(body_words, single_han)
         body_hits = query_terms.intersection(counts)
@@ -210,6 +215,51 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
     return results
 
 
+def rank_candidates(store, query, limit, admission_year=None, rows=None, *,
+                    ranker=None, trace=None, topic="admissions", stage="global", fallback=False):
+    """Rank the complete applicable pool, with the existing lexical ordering as a callback."""
+    if limit < 1:
+        raise ValueError("Search limit must be positive")
+    pool = store.current_chunks() if rows is None else rows
+    years = {word for clause in _query_clauses(query) for word in clause if _YEAR.fullmatch(word)}
+    candidates = list(_cohort_rows(pool, query, admission_year, years))
+
+    def lexical(count):
+        ranked = search_natural(store, query, count, admission_year, candidates)
+        if not fallback:
+            return ranked
+        # 图书馆先锁定可用条款。问句改写没有词法匹配时仍保留该条款。
+        result = {}
+        for row in ranked + candidates:
+            result.setdefault((row["version_id"], row["chunk_id"]), row)
+            if len(result) == count:
+                break
+        return list(result.values())
+
+    if ranker is None:
+        hits = lexical(limit)
+    else:
+        allowed = {(row["version_id"], row["chunk_id"]): row for row in candidates}
+        ranked = ranker(query, candidates, limit, lexical) if candidates else ()
+        hits_by_key = {}
+        for hit in ranked:
+            key = hit["version_id"], hit["chunk_id"]
+            if key not in allowed:
+                raise ValueError("Ranker selected evidence outside the candidate scope")
+            # 排名器可提供分数和摘要，引用的正文和位置以原始候选为准。
+            hits_by_key.setdefault(key, dict(hit, **allowed[key]))
+            if len(hits_by_key) == limit:
+                break
+        hits = list(hits_by_key.values())
+    if trace is not None:
+        trace.append({
+            "topic": topic, "stage": stage, "query": query,
+            "candidate_ids": [row["chunk_id"] for row in candidates],
+            "ranked_ids": [row["chunk_id"] for row in hits],
+        })
+    return hits
+
+
 def explicit_subquestions(query):
     """Conservatively select separate clauses with their own question marker."""
     clauses = (clause.strip() for clause in _CLAUSE_BREAK.split(query))
@@ -217,18 +267,24 @@ def explicit_subquestions(query):
     return questions if 2 <= len(questions) <= 5 else []
 
 
-def search_admission_question(store, query, limit, admission_year, rows=None, reserved=()):
+def search_admission_question(store, query, limit, admission_year, rows=None, reserved=(), *,
+                              ranker=None, trace=None):
     """Reserve one evidence slot per explicit subquestion, then fill globally."""
-    global_hits = search_natural(store, query, limit, admission_year, rows)
+    global_hits = rank_candidates(store, query, limit, admission_year, rows, ranker=ranker, trace=trace)
     questions = explicit_subquestions(query)
     if not questions and not reserved:
         return global_hits
     if not global_hits and not reserved:
+        if trace is not None:
+            for question in questions:
+                rank_candidates(store, question, 1, admission_year, rows, ranker=ranker,
+                                trace=trace, stage="subquestion")
         return []
     # 范围检索预留的证据优先，随后为各个明确子问取首条，再用全问结果补足。
     candidates = [
         hit for question in questions
-        for hit in search_natural(store, question, 1, admission_year, rows)
+        for hit in rank_candidates(store, question, 1, admission_year, rows, ranker=ranker,
+                                   trace=trace, stage="subquestion")
     ]
     results = {}
     for hit in list(reserved) + candidates + global_hits:

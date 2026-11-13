@@ -1,0 +1,161 @@
+[
+  {
+    "id": "H01",
+    "question": "全日制0820J2的智能油气地质勘探方向，外语考英语一还是英语二？专业课要考408吗？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "全日制0820J2方向03的初试外语为201英语一，第四门为408计算机学科专业基础",
+        "alternatives": [{"sample": "masters-full-time-directory-2027", "page": 1, "row": 15}]
+      }
+    ],
+    "wrong_scope": [
+      {"sample": "masters-full-time-directory-2027", "page": 6, "row": 22},
+      {"sample": "masters-part-time-directory-2027", "page": 2, "row": 24}
+    ],
+    "notes": "085404也考408，不能用其英语二推断0820J2的外语。"
+  },
+  {
+    "id": "H02",
+    "question": "我想报石工院非全日制085706的油气田开发与海洋油气工程，这个方向拟招几个人，第四门考啥？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "石油与天然气工程学院非全日制085706方向02拟招13人，不含单考，第四门为802油层物理",
+        "alternatives": [{"sample": "masters-part-time-directory-2027", "page": 1, "row": 6}]
+      }
+    ],
+    "wrong_scope": [
+      {"sample": "masters-full-time-directory-2027"},
+      {"sample": "masters-part-time-directory-2027", "page": 1, "row": 5},
+      {"sample": "masters-part-time-directory-2027", "page": 1, "row": 7},
+      {"sample": "masters-part-time-directory-2027", "page": 4, "row": 4}
+    ],
+    "notes": "23是非全日制专业合计，117是全日制同名方向拟招，4也见于其他方向或学院。"
+  },
+  {
+    "id": "H03",
+    "question": "我看中了全日制的081800，第四门专业课考哪门？",
+    "expected_status": "clarify",
+    "required": [],
+    "wrong_scope": [],
+    "notes": "需确认研究方向。全日制目录第2页第9至12行分别列807石油地质综合、808岩石物理基础、811工程地质、830地理信息系统概论。任何单一方向的科目都不足以回答；同时列出分支候选并询问方向是合理的。"
+  },
+  {
+    "id": "H04",
+    "question": "我考外校的研究生，初试里有一科考四个小时，只想借西南石油大学本部5110的考场，能选这个点吗？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "5110不接收初试科目时长超过三小时者，应选择所报招生单位的报考点，误选5110将不予网上确认",
+        "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 27}]
+      }
+    ],
+    "wrong_scope": [{"sample": "masters-admissions-unit-10615-2027"}],
+    "notes": "提问者报考外校。10615公告的明示对象是报考西南石油大学的考生。"
+  },
+  {
+    "id": "H05",
+    "question": "我硕士还在读，打算报西油2027年的普通硕士，报名之前要先征得学校同意吗？如果我选西油本部5110考点，要上传什么证明？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "在读研究生报考须在报名前征得所在培养单位同意",
+        "alternatives": [{"sample": "masters-admissions-charter-2027", "paragraph": 54}]
+      },
+      {
+        "label": "5110要求上传培养单位盖章的同意报考书面证明",
+        "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 14}]
+      }
+    ],
+    "wrong_scope": [],
+    "notes": "只问在读身份的同意和证明，不据此判断已满足5110全部报考条件。"
+  },
+  {
+    "id": "H06",
+    "question": "我已经在西油本部5110交了报名费。主动取消报名最晚要到什么时候才能退费？要是确认以后直接缺考，还退吗？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "因个人原因放弃或填报有误，须在2026年10月24日22:00前于网报系统取消已缴费报名，系统统一处理退费",
+        "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 43}]
+      },
+      {
+        "label": "完成网报信息确认后未参加考试，已缴报名考试费不退",
+        "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 44}]
+      }
+    ],
+    "wrong_scope": []
+  },
+  {
+    "id": "H07",
+    "question": "西南石油大学2027年法学院全日制法律（非法学）的复试定在几月几号，具体在哪栋楼？",
+    "expected_status": "insufficient",
+    "required": [
+      {
+        "label": "章程未给具体复试时间、地点，要求届时查研究生院网站并联系相关学院",
+        "alternatives": [{"sample": "masters-admissions-charter-2027", "paragraph": 86}]
+      }
+    ],
+    "wrong_scope": [
+      {"sample": "masters-admissions-charter-2027", "paragraph": 76},
+      {"sample": "masters-exam-site-5110-2027", "paragraph": 2}
+    ],
+    "notes": "缺少复试具体日期和楼栋。章程的初试日期及5110地址不能作复试安排。"
+  },
+  {
+    "id": "H08",
+    "question": "085901土木工程每年学费是多少？我听说要一万，那个数是不是非全日制的？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "085901土木工程单列收费，全日制8000、非全日制10000",
+        "alternatives": [{"sample": "masters-admissions-charter-2027", "paragraph": 113}]
+      },
+      {
+        "label": "收费表两列依次为全日制和非全日制，单位为元每年每生",
+        "alternatives": [{"sample": "masters-admissions-charter-2027", "paragraph": 105}]
+      }
+    ],
+    "wrong_scope": [
+      {"sample": "masters-admissions-charter-2027", "paragraph": 106},
+      {"sample": "masters-admissions-charter-2027", "paragraph": 107}
+    ],
+    "notes": "该专业有单列标准，通用学科门类行明确排除单列专业。章程第121块补充说明收费以学校正式文件为准。"
+  },
+  {
+    "id": "H09",
+    "question": "经管院非全日制的MBA目录里招多少人？这个数是最后确定的录取名额吗？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "经济管理学院非全日制125100工商管理拟招62人，不含单考",
+        "alternatives": [{"sample": "masters-part-time-directory-2027", "page": 4, "row": 6}]
+      },
+      {
+        "label": "目录数字为拟招生人数，各专业实际计划可能增减",
+        "alternatives": [
+          {"sample": "masters-admissions-charter-2027", "paragraph": 18},
+          {"sample": "masters-part-time-directory-2027", "page": 1, "row": 1}
+        ]
+      }
+    ],
+    "wrong_scope": [{"sample": "masters-part-time-directory-2027", "page": 3, "row": 30}]
+  },
+  {
+    "id": "H10",
+    "question": "我读的是网络教育本科，想考西油2027年的普通硕士。复试那会儿本科毕业证还没发，要加考吗？最晚什么时候拿到证才不影响录取资格？",
+    "expected_status": "evidence",
+    "required": [
+      {
+        "label": "复试时尚未拿到本科毕业证的网络教育考生须笔试加试至少两门相关本科主干课程，科目不得与初试相同，加试不合格不录取",
+        "alternatives": [{"sample": "masters-admissions-charter-2027", "paragraph": 87}]
+      },
+      {
+        "label": "录取当年入学前（新生入学报到当日）须取得国家承认的本科毕业证书，未取得者录取资格无效",
+        "alternatives": [{"sample": "masters-admissions-charter-2027", "paragraph": 102}]
+      }
+    ],
+    "wrong_scope": []
+  }
+]

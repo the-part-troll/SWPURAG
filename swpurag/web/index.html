@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>西南石油大学 · 官网资料问答</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h5a5 5 0 0 1 5 5v11a5 5 0 0 0-5-5H4zm20 0h-5a5 5 0 0 0-5 5v11a5 5 0 0 1 5-5h5zM7 11h3m-3 3h3m8-3h3m-3 3h3"/></svg>
+        </span>
+        <span>西南石油大学</span>
+      </div>
+      <span class="header-caption">官网资料问答 · 本地演示</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="question-panel" aria-labelledby="page-title">
+      <h1 class="page-title" id="page-title">查询官网资料</h1>
+      <p class="intro">支持 2027 年普通硕士招生和成都校区图书馆服务。回答会标明依据及原文位置。</p>
+      <form id="ask-form" class="ask-form">
+        <label for="question" class="input-label">你的问题</label>
+        <textarea id="question" name="question" rows="5" maxlength="1000" placeholder="例如，成都总馆平时几点关门？" aria-describedby="question-hint" required></textarea>
+        <div class="input-footer">
+          <span id="question-hint">可同时询问招生与图书馆服务</span>
+          <button id="ask-submit" class="ask-submit" type="submit">查询资料 <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+      <section class="examples" aria-labelledby="examples-title">
+        <h2 id="examples-title">试试这些问题</h2>
+        <button type="button" class="example-button" data-question="计算机与软件学院全日制085404初试第四门是什么？">
+          <span class="example-topic">招生</span><span>全日制计算机技术初试考什么？</span><span class="example-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="example-button" data-question="2026年12月18日成都二期图书馆晚上几点关门？">
+          <span class="example-topic">图书馆</span><span>成都二期图书馆几点关门？</span><span class="example-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="example-button" data-question="计算机与软件学院全日制085404初试第四门是什么？另外，成都总馆平时几点关门？">
+          <span class="example-topic">跨主题</span><span>同时查询初试科目和开放时间</span><span class="example-arrow" aria-hidden="true">↗</span>
+        </button>
+      </section>
+    </section>
+
+    <section id="result" class="result-panel" aria-labelledby="result-title">
+      <header class="result-header">
+        <h2 id="result-title">查询结果</h2>
+        <span id="result-status" class="status-badge" role="status" aria-live="polite" aria-atomic="true" hidden></span>
+      </header>
+      <div id="result-content" class="result-content" aria-busy="false">
+        <div id="empty-state" class="empty-state">
+          <span class="empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6h13l6 6v20a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><path d="M24 6v7h6M14 18h11m-11 5h11m-11 5h6"/></svg>
+          </span>
+          <h3>从一个问题开始</h3>
+          <p>输入问题或选择示例，查询后可查看回答和原文证据。</p>
+        </div>
+        <p id="submitted-question" class="submitted-question" hidden></p>
+        <div id="answer-groups"></div>
+        <section id="evidence-section" class="evidence-section" aria-labelledby="evidence-title" hidden>
+          <div class="evidence-header"><h3 id="evidence-title">原文证据</h3><span id="evidence-count" class="evidence-count"></span></div>
+          <div id="evidence-list"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <footer class="page-footer"><p>资料来自已归档的公开官网页面。生成回答时，问题和检索到的公开证据会发往配置的模型服务。</p></footer>
+  <noscript><p>请启用 JavaScript 后查询资料。</p></noscript>
+</body>
+</html>

@@ -1,0 +1,143 @@
+[
+  {
+    "id": "H11",
+    "question": "明辨楼 F 区那个图书馆，平常晚上到几点清场？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "成都二期分馆常规开放至 22:00，临时调整看公告", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 23}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 1},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6}
+    ]
+  },
+  {
+    "id": "H12",
+    "question": "2026年10月19日我去成都一期图书馆，早上几点能进，晚上能待到几点？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "一期总馆常规 8:00 开馆，具体安排看公告", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 1}]},
+      {"label": "延时通知从当天起生效，晚间至 22:30", "alternatives": [{"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6}
+    ],
+    "notes": "延时公告只调整晚间，常规开放段用于早上开馆时间。"
+  },
+  {
+    "id": "H13",
+    "question": "按 2026 年暑假那份安排，8 月 27 号成都二期图书馆几点能进、几点闭馆？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "暑期 8 月 27–30 日两馆均 8:00–22:00", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "问题中的 2026 年是对这份暑期安排的限定。"
+  },
+  {
+    "id": "H14",
+    "question": "2026年8月25日，暑假通知里成都二期图书馆具体几点开？",
+    "expected_status": "insufficient",
+    "required": [],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 1},
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "同期暑期第 6 段只列总馆，可以作为缺口的背景，不能当作二期开馆或闭馆的依据。"
+  },
+  {
+    "id": "H15",
+    "question": "我在成都总馆借的书还没看完，最多能往后续几回？",
+    "expected_status": "clarify",
+    "required": [],
+    "wrong_scope": [],
+    "notes": "本科生、研究生与校外持证人员的续借规定不同，需要确认读者类别。"
+  },
+  {
+    "id": "H16",
+    "question": "我晚点想去成都总馆自习，听说它会开得比平常晚，能待到几点？",
+    "expected_status": "clarify",
+    "required": [],
+    "wrong_scope": [],
+    "notes": "问的是延长安排是否适用，缺少具体日期，不能将 22:30 当作固定时间。"
+  },
+  {
+    "id": "H17",
+    "question": "成都总馆的书原定2026年8月28日归还，按那次暑期延期安排，最迟哪天还才不算超期？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "到期日在暑期延期范围内，2026 年 9 月 6 日含当天前还书不超期", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 12}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "暑期开馆时段和还书延期适用日期独立。"
+  },
+  {
+    "id": "H18",
+    "question": "成都二期图书馆三楼现在有没有空位？还有几张座？",
+    "expected_status": "insufficient",
+    "required": [],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 1},
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ],
+    "notes": "开馆时间和馆内布局都无法证明实时余座。"
+  },
+  {
+    "id": "H19",
+    "question": "我报2027年石油与天然气工程学院非全日制085706油气储运工程，第四门考啥？另外，2026年7月19日成都分馆晚上开到几点？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "非全日制 085706 油气储运工程方向初试第四门为 801 工程流体力学", "alternatives": [{"sample": "masters-part-time-directory-2027", "page": 1, "row": 7}]},
+      {"label": "暑期 7 月 19 日成都分馆适用 8:00–22:00", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5}]}
+    ],
+    "wrong_scope": [
+      {"sample": "masters-full-time-directory-2027"},
+      {"sample": "masters-part-time-directory-2027", "page": 1, "row": 5},
+      {"sample": "masters-part-time-directory-2027", "page": 1, "row": 6},
+      {"sample": "masters-part-time-directory-2027", "page": 4, "row": 4},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ]
+  },
+  {
+    "id": "H20",
+    "question": "我今年还是本科生，成都总馆借的书能续几回，手机上去哪操作？再问下，西南石油大学2027硕士预报名已经完成，正式报名还用重报吗？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "本科生可续借 1 次，续借期 30 天", "alternatives": [{"sample": "library-chengdu-loan-rights", "paragraph": 2}]},
+      {"label": "可用移动图书馆等入口进行续借", "alternatives": [{"sample": "library-chengdu-reader-guide", "paragraph": 18}]},
+      {"label": "已完成预报名无需再次报名，关注审核结果", "alternatives": [{"sample": "masters-admissions-unit-10615-2027", "paragraph": 8}, {"sample": "masters-exam-site-5110-2027", "paragraph": 5}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-loan-rights", "paragraph": 5},
+      {"sample": "library-chengdu-loan-rights", "paragraph": 8}
+    ]
+  },
+  {
+    "id": "H21",
+    "question": "2027考研报名选5110，考位满了我还没付款，该怎么重新选点？还有，成都二期图书馆2026年暑假原定8月24日到期的书，9月6日还算不算超期？",
+    "expected_status": "evidence",
+    "required": [
+      {"label": "5110 达缴费上限后，未缴费者停止缴费并先取消当前报名，再按可选考点重选", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 36}]},
+      {"label": "暑期延期通知明确 9 月 6 日含当天归还不超期", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 12}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}
+    ]
+  }
+]
