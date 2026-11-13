@@ -25,11 +25,13 @@ def topic_questions(question):
             continue
         if _LIBRARY.search(fragment):
             topic = "library"
+        # “研究生”也可能是图书馆读者身份，复合问句须有明确的招生意图才另行检索。
         elif _ADMISSIONS.search(fragment) and (_ADMISSION_ACTION.search(fragment) or not _LIBRARY.search(question)):
             topic = "admissions"
         else:
             topic = last
         if topic is None:
+            # 校区、日期等先于主题出现时，等找到后续主题再一并归入。
             pending.append(fragment)
             continue
         groups.setdefault(topic, []).extend(pending + [fragment])
@@ -44,6 +46,7 @@ def topic_questions(question):
 def interleave_hits(groups, limit):
     """Give each participating theme a slot before adding lower ranks."""
     hits = {}
+    # 各主题轮流取一个结果，使共享的数量上限尽可能覆盖每个主题。
     for index in range(max(map(len, groups), default=0)):
         for group in groups:
             if index < len(group):

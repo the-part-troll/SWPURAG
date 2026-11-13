@@ -18,6 +18,7 @@ class AnswerTest(unittest.TestCase):
             "follow_up": "",
         }
         self.assertEqual(validate_answer(answer, evidence), answer)
+        # 允许折叠原文换行，同时分别验证无效编号和原文中不存在的引文。
         for citation in ({"id": 2, "quote": "收费标准"}, {"id": 1, "quote": "收费 20000 元"}):
             with self.subTest(citation=citation):
                 answer["claims"][0]["citations"] = [citation]
@@ -60,6 +61,7 @@ class AnswerTest(unittest.TestCase):
             validate_parts({"parts": parts[:1]}, evidence, questions)
 
     def test_mixed_question_uses_shared_budget_and_separate_citations(self):
+        # 图书馆仅命中一条，用招生的额外候选验证两个主题共享五条证据额度。
         library = {"chunk_id": 1, "version_id": 1, "ordinal": 1, "locator": {}, "topic": "library"}
         admissions = [{"chunk_id": index, "version_id": 2, "ordinal": index, "locator": {},
                        "text": "招生证据"}

@@ -32,6 +32,7 @@ class ImportLifecycleTest(unittest.TestCase):
         self.samples = {sample["id"]: sample for sample in manifest if sample["id"] in PUBLIC_SAMPLE_IDS}
         urls = {sample["url"] for sample in self.samples.values()}
         self.receipts = {receipt["url"]: receipt for receipt in receipts if receipt["url"] in urls}
+        # 将真实原件复制到临时归档，后续测试可在副本上制造更新或损坏。
         for receipt in self.receipts.values():
             original = (ROOT / "data" / receipt["raw_path"]).read_bytes()
             stored = archive(self.data_dir, original)
@@ -81,6 +82,7 @@ class ImportLifecycleTest(unittest.TestCase):
                 self.assertEqual(locator["kind"], "html")
                 self.assertGreaterEqual(locator["paragraph"], 1)
                 self.assertTrue(locator["selector"])
+                # 按行列回到原始 HTML，直接验证定位落在含引文的段落。
                 original = (self.data_dir / hit["raw_path"]).read_text(encoding="utf-8")
                 lines = original.splitlines(keepends=True)
                 line_index = locator["line"] - 1
@@ -103,6 +105,7 @@ class ImportLifecycleTest(unittest.TestCase):
         self.assertEqual(exact_repeat["version_id"], first["version_id"])
 
         raw = self.overview_bytes()
+        # 仅追加 HTML 注释，原件哈希会变化，正文版本应复用。
         template_only = self.snapshot(
             raw + b"\n<!-- Synthetic fixture: template-only change -->\n",
             "2026-11-12T15:00:00+08:00",
@@ -149,6 +152,7 @@ class ImportLifecycleTest(unittest.TestCase):
         self.assertEqual(replayed["current_version_id"], updated["version_id"])
         self.assertEqual(self.store.search(CHANGED_TEXT)[0]["version_id"], updated["version_id"])
 
+        # UTC 时间晚于前一次成功抓取，重现的旧正文应重新成为当前版本。
         recent_original = dict(self.receipt(OVERVIEW), fetched_at="2026-11-12T07:02:00Z")
         restored = self.ingest(OVERVIEW, recent_original)
         self.assertEqual(restored["status"], "reverted")
@@ -169,6 +173,7 @@ class ImportLifecycleTest(unittest.TestCase):
         changed = self.overview_bytes().replace(
             ORIGINAL_TEXT.encode("utf-8"), CHANGED_TEXT.encode("utf-8"), 1
         )
+        # 07:25 UTC 即北京时间 15:25，内容不同但早于上方 15:30 的成功抓取。
         intermediate = self.snapshot(changed, "2026-11-12T07:25:00Z")
         history = self.ingest(OVERVIEW, intermediate)
         self.assertFalse(history["is_current"])
@@ -184,6 +189,7 @@ class ImportLifecycleTest(unittest.TestCase):
         previous = self.store.search(ORIGINAL_TEXT)
         start = '<html><head><title>学校概况</title></head><body><div id="vsb_content">'
         end = "</div></body></html>"
+        # 模拟带正常标题和正文容器的 HTTP 200 页面，检查异常内容能否被识别。
         fixtures = (
             (start + "<p>网站正在维护，请稍后访问。</p>" + end, "maintenance"),
             (start + "<h1>学校概况</h1><p>请先登录后查看正文。</p>" + end, "login"),
@@ -205,6 +211,7 @@ class ImportLifecycleTest(unittest.TestCase):
                 self.assertEqual(attempt["raw_sha256"], receipt["raw_sha256"])
                 self.assertEqual(self.store.search(ORIGINAL_TEXT), previous)
 
+        # 正常通知也可能提到登录，借此检查正文不会被误识别为登录页。
         body = '<p id="apply">请先登录招生系统，按通知要求提交报名材料并确认提交结果。</p>'
         valid = self.snapshot((start + body + end).encode("utf-8"), "2026-11-12T17:00:00+08:00")
         sample = dict(
@@ -247,6 +254,7 @@ class ImportLifecycleTest(unittest.TestCase):
             self.overview_bytes() + b"\n<!-- Synthetic fixture: archive integrity -->",
             "2026-11-12T15:04:00+08:00",
         )
+        # 保持抓取记录不变，替换本地原件字节，单独触发哈希校验失败。
         (self.data_dir / damaged["raw_path"]).write_bytes(self.overview_bytes())
         for receipt in (access_failure, invalid_html, damaged):
             self.assertEqual(self.ingest(OVERVIEW, receipt)["status"], "failed")

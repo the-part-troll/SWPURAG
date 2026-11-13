@@ -27,6 +27,7 @@ def catalog_row(number, mode, college, subject):
 
 class CatalogScopeTest(unittest.TestCase):
     def setUp(self):
+        # 四条记录共用专业代码，各学院和学习方式组合用不同科目区分。
         self.rows = [
             catalog_row(1, "全日制", "001甲学院", "801计算基础"),
             catalog_row(2, "非全日制", "001甲学院", "802通信基础"),

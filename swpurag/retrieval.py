@@ -42,6 +42,7 @@ def _words(text):
 
 
 def _grams(word):
+    # 中文取相邻两字，英文和专业代码保留整词。
     if word.isascii() or len(word) == 1:
         return [word]
     return [word[index:index + 2] for index in range(len(word) - 1)]
@@ -58,6 +59,7 @@ def _counts(words, single_han):
 def _query_clauses(query):
     clauses = []
     for clause in _CLAUSE_BREAK.split(_search_text(query)):
+        # 去掉“多久”等问词时，保留“满”等会影响条件的词。
         clause = _DURATION_BOUND.sub(r" \1 ", clause)
         words = _WORD.findall(_QUESTION_WORDS.sub(" ", clause.strip()))
         words = [word for word in words if word not in _CONTEXT_WORDS]
@@ -86,8 +88,7 @@ def _supported_terms(clauses, doc_terms, years, shared_context):
 def _snippet(text, terms, width=220):
     if len(text) <= width:
         return text
-    # Keep original character offsets through NFKC and spaces within Chinese
-    # words so the excerpt contains an actual hit without changing the source.
+    # 规范化字符、去掉汉字间的空白时保留原始位置，摘录仍取自原文。
     normalized = []
     offsets = []
     for offset, char in enumerate(text):
@@ -120,9 +121,9 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
     query_terms = {term for clause in clauses for grams in clause.values() for term in grams}
     if not query_terms:
         return []
-    # Single characters retain a weak signal when a paraphrase changes a
-    # compound word. A result still needs an exact query word or bigram.
+    # 改写后的词组可能只剩单字相同，单字仅辅助排序。入选仍需命中整词或相邻两字。
     single_han = {char for term in query_terms for char in term if _HAN_CHAR.fullmatch(char)}
+    # 招生届次限定候选文档，报考日期中的年份仍作为正文检索词。
     explicit_years = {term for term in query_terms if _YEAR.fullmatch(term)}
     dated_years = set(_DATED_YEAR.findall(_search_text(query)))
     cohort_years = explicit_years - dated_years
@@ -154,6 +155,7 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
     if not frequencies:
         return []
 
+    # BM25 用候选段落的词频和平均长度定权，另给长数字代码加权。
     average_length = sum(sum(counts.values()) for _, counts, _ in blocks) / len(blocks)
     weights = {
         term: math.log1p((len(blocks) - frequency + 0.5) / (frequency + 0.5))
@@ -164,8 +166,7 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
             weights[term] *= 0.24
         elif term.isdigit() and len(term) >= 4 and term not in explicit_years:
             weights[term] *= 2.0
-    # In a scoped corpus, the issuer shared by every document provides
-    # context but does not by itself identify a relevant evidence paragraph.
+    # 排除候选文档共有的发布单位用语，避免仅凭校名等通用字词选出证据。
     shared_context = set.intersection(*unit_terms) if len(unit_terms) > 1 else set()
     matches = []
     supported = {}
@@ -191,8 +192,7 @@ def search_natural(store, query, limit=5, admission_year=None, rows=None):
         result = dict(row, matched_terms=sorted(topic_hits, key=lambda term: (-weights[term], term)))
         matches.append((score, result))
 
-    # When several sources provide separate evidence, a small novelty bonus
-    # prioritizes a new supported topic over repeated mentions of one topic.
+    # 优先补充已选段落未覆盖的检索词，减少多个结果重复同一信息。
     results = []
     covered = set()
     while matches and len(results) < limit:
@@ -225,6 +225,7 @@ def search_admission_question(store, query, limit, admission_year, rows=None, re
         return global_hits
     if not global_hits and not reserved:
         return []
+    # 范围检索预留的证据优先，随后为各个明确子问取首条，再用全问结果补足。
     candidates = [
         hit for question in questions
         for hit in search_natural(store, question, 1, admission_year, rows)

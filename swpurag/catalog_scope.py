@@ -80,6 +80,7 @@ def _mentioned_colleges(query, names):
 def _pair_comparison(query, targets, colleges):
     if len(colleges) < 2:
         return targets
+    # 仅在分句明确给出两种学习方式各自的学院时保留配对，避免交叉组合。
     starters = [mode for mode in MODES]
     for college in colleges:
         starters.extend((college,) + _COLLEGE_ALIASES.get(college, ()))
@@ -108,6 +109,7 @@ def search_scoped(store, question, limit, admission_year):
     if compare_modes:
         modes = MODES
     elif len(modes) == 2:
+        # 同时提到两种方式不一定是比较，优先取“报考”等动作明确指向的一种。
         target = _TARGET_MODE.search(query)
         modes = (target.group(1),) if target else ()
     colleges = sorted(_mentioned_colleges(query, {_college(row) for row in directions if _college(row)}))
@@ -127,6 +129,7 @@ def search_scoped(store, question, limit, admission_year):
     if "program_count" in fields and "direction" in fields:
         fields.append("direction_count")
 
+    # 缺失的范围确实会改变所问字段时才澄清。先比较学习方式，再比较同一方式下的学院和方向。
     clarify = []
     if fields and targets and not special_exam:
         if not modes and _has_difference(targets, _mode, fields):
@@ -146,6 +149,7 @@ def search_scoped(store, question, limit, admission_year):
     pool = []
     for row in rows:
         if row.get("role") == "admission_directory":
+            # 普通目录不适用于单独考试等特殊类别，章程等材料仍可用于核对规则。
             if special_exam:
                 continue
             if row["locator"].get("row_type") == "direction":
@@ -157,6 +161,7 @@ def search_scoped(store, question, limit, admission_year):
                 continue
         pool.append(row)
 
+    # 对比时为每侧预留证据。兼问政策时另留政策段落，避免都被目录条目占用。
     reserved = []
     if targets and catalog_lookup and not special_exam:
         if compare_modes:

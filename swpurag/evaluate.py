@@ -36,6 +36,7 @@ class ArchiveCheck:
             url, digest = evidence["url"], evidence["raw_sha256"]
             key = url, digest, evidence["raw_path"]
             if key not in self.cache:
+                # 按原件哈希核验并重新解析，缓存结果供同一原件的多条引文复核。
                 sample = self.samples[url]
                 raw = read_archive(self.data_dir, evidence, document_format(sample))
                 _, chunks, _ = extract_document(raw, self.charsets.get(digest), sample)
@@ -65,6 +66,7 @@ def matches_evidence(hit, item):
 
 
 def matching_ranks(hits, alternatives):
+    # 一组证据允许多个等价来源，命中任意一个就满足该组要求。
     return [
         rank for rank, hit in enumerate(hits, 1)
         if any(matches_evidence(hit, item) for item in alternatives)
@@ -76,6 +78,7 @@ def evaluate(store, question, method, archive, generate):
     if generate:
         answer = answer_question(store, text, method)
         all_evidence = answer.pop("evidence")
+        # 表头和条款标题可用于引用，但不计入 Top 5 的证据覆盖。
         hits = [hit for hit in all_evidence if hit["rank"] is not None]
     else:
         hits = retrieve(store, text, method, 5)
@@ -104,6 +107,7 @@ def evaluate(store, question, method, archive, generate):
         "expected_answer": question["expected"],
         "method": method,
         "required_group_ranks": groups,
+        # 没有标注必需证据组的题不计入覆盖率分母。
         "all_required_in_top5": all(groups) if groups else None,
         "evidence": evidence,
         "answer": answer,
@@ -151,6 +155,7 @@ def main():
     db_path = args.db or args.data_dir / "corpus.sqlite3"
     if not db_path.is_file():
         parser.error("database not found; import the archived pages first")
+    # 独占创建结果文件以保留已有评测，逐题写入便于中断后核对。
     with Store(db_path) as store, args.output.open("x", encoding="utf-8") as output:
         for question in questions:
             for method in methods:

@@ -31,6 +31,7 @@ def import_pages(store, args):
         raise ValueError("Unknown sample id: {}".format(args.sample))
     selected = [samples[args.sample]] if args.sample else manifest
     if args.command == "import":
+        # 离线导入先核对收据是否齐全，避免清单缺项时只导入一部分。
         receipts = read_json(args.captures)
         by_url = {receipt["url"]: receipt for receipt in receipts}
         if len(by_url) != len(receipts):
@@ -43,6 +44,7 @@ def import_pages(store, args):
     for index, sample in enumerate(selected):
         if args.command == "fetch":
             if index:
+                # 批量抓取仍逐页请求，间隔一秒。
                 time.sleep(1)
             receipt = capture(sample, args.data_dir)
         else:
@@ -84,6 +86,7 @@ def print_matches(results, query):
             print("正文块 {paragraph} · HTML 第 {line} 行第 {column} 列".format(**locator))
             print("定位 {}".format(locator["selector"]))
             if result.get("topic") == "library":
+                # 同一公告可分馆舍和日期，正文块的范围优先于页面默认值。
                 scope = dict({key: result.get(key) for key in (
                     "campus", "building", "effective_from", "effective_to",
                 )}, **locator.get("library_scope", {}))
@@ -109,6 +112,7 @@ def print_answer(result):
     if result.get("follow_up"):
         label = "需要补充" if result["status"] == "clarify" else "证据缺口"
         print("{} {}".format(label, result["follow_up"]))
+    # 保留本次问答的证据编号，仅展示回答实际引用的摘录。
     quotes = {}
     for claim in result["claims"]:
         for citation in claim["citations"]:

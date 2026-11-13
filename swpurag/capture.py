@@ -26,6 +26,7 @@ def timestamp():
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
+        # 重定向也记作本次请求的结果，采集范围以清单原地址为准。
         return None
 
 
@@ -55,7 +56,7 @@ def archive(data_dir, body, document_format="html"):
     if target.exists() and target.read_bytes() == body:
         return {"raw_sha256": digest, "raw_path": relative_path}
 
-    # Replace atomically so a reader sees a complete file even on concurrent imports.
+    # 在同目录写完临时文件再原子替换，避免并发读到未写完的原件。
     with tempfile.NamedTemporaryFile(dir=str(target.parent), delete=False) as temporary:
         temporary_path = temporary.name
         try:
@@ -70,6 +71,7 @@ def archive(data_dir, body, document_format="html"):
 
 def read_archive(data_dir, receipt, file_format):
     digest = receipt.get("raw_sha256")
+    # 从哈希推导路径并比对收据，避免依收据读取其他位置的文件。
     relative_path = raw_path_for(digest, file_format)
     if relative_path != receipt.get("raw_path"):
         raise ValueError("Invalid content-addressed {} path".format(file_format.upper()))
@@ -85,6 +87,7 @@ def validate_url(sample):
     url = urlsplit(sample["url"])
     prefix = sample["path_prefix"]
     path = url.path or "/"
+    # 按完整路径段匹配，避免同名前缀的相邻栏目进入范围。
     in_scope = path == prefix or path.startswith(prefix.rstrip("/") + "/")
     if (url.scheme != "https" or url.netloc.lower() != sample["host"].lower()
             or not prefix.startswith("/") or not in_scope or url.fragment):

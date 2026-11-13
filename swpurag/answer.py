@@ -73,6 +73,7 @@ def request_model(question, evidence, system_prompt, subquestions=(), query_scop
             or url.query or url.fragment):
         raise AnswerError("SWPURAG_BASE_URL 必须是无凭据、查询参数或片段的 HTTPS 基地址")
     key = os.environ.get("SWPURAG_API_KEY")
+    # 通用密钥可配自定义端点，DeepSeek 专用密钥仅发往官方地址。
     if not key and base_url == "https://api.deepseek.com":
         key = os.environ.get("DEEPSEEK_API_KEY")
     if not key or not key.strip():
@@ -108,6 +109,7 @@ def request_model(question, evidence, system_prompt, subquestions=(), query_scop
         method="POST",
     )
     try:
+        # 禁止重定向，避免携带 Authorization 的请求跳到其他地址。
         with build_opener(NoRedirect()).open(request, timeout=45) as response:
             raw = response.read(1024 * 1024 + 1)
         if len(raw) > 1024 * 1024:
@@ -132,6 +134,7 @@ def request_model(question, evidence, system_prompt, subquestions=(), query_scop
 
 
 def normalize_quote(text):
+    # 忽略原文排版带来的空白差异，保留字词、标点和数字。
     return re.sub(r"\s+", "", text)
 
 
@@ -152,7 +155,7 @@ def validate_answer(answer, evidence):
     if status == "answered":
         if not claims:
             raise AnswerError("完整回答缺少引证")
-        # Only evidence-backed claims may be shown for a complete answer.
+        # 完整回答只展示通过引证校验的事实条目。
         follow_up = ""
     elif not safe_prose(follow_up) or not follow_up.strip():
         raise AnswerError("证据不足或歧义时需说明缺口")
@@ -225,6 +228,7 @@ def evidence_with_context(store, hits):
     by_position = {(row["version_id"], row["ordinal"]): row for row in rows}
 
     def add_context(row, kind):
+        # 表头和条款标题用于解释命中片段，不占用检索名次。
         if row["chunk_id"] not in seen:
             evidence.append(dict(row, id=len(evidence) + 1, rank=None, context=kind,
                                  evidence_topic="admissions"))
@@ -237,6 +241,7 @@ def evidence_with_context(store, hits):
     for hit in hits:
         if hit.get("topic") == "library" or not re.match(r"^\d+[.．、]", hit["text"]):
             continue
+        # 在同一版本内最多回看 12 段，查找能限定条款范围的标题。
         for ordinal in range(hit["ordinal"] - 1, max(0, hit["ordinal"] - 13), -1):
             row = by_position.get((hit["version_id"], ordinal))
             if row is None:
@@ -270,7 +275,7 @@ def validate_parts(candidate, evidence, subquestions):
 
 
 def synthesize(question, evidence, system_prompt=SYSTEM_PROMPT, subquestions=(), query_scope=None):
-    # The API receives only the question, public evidence, and its applicability metadata.
+    # 只将问句、公开证据及适用范围发送给模型，本地归档路径留在应用侧。
     context = []
     contains_pdf = False
     for item in evidence:
@@ -309,8 +314,10 @@ def answer_question(store, question, method="natural", limit=5):
     parts = {}
     for topic, text in questions.items():
         scope = scopes[topic]
+        # 各主题独立作答，引用校验也只接收该主题的证据。
         relevant = [item for item in evidence if item["evidence_topic"] == topic]
         gaps = " ".join(scope.get("unsupported") or [])
+        # 能确定范围歧义或证据缺口时，直接给出追问或说明。
         if scope.get("clarification"):
             result = {"status": "clarify", "claims": [], "follow_up": scope["clarification"],
                       "answer_origin": "scope_check"}

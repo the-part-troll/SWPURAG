@@ -28,6 +28,7 @@ class FullTimeCatalogTest(unittest.TestCase):
             sample = next(item for item in manifest if item["id"] == sample_id)
             body = read_archive(ROOT / "data", by_url[sample["url"]], "pdf")
             _, chunks, _ = extract_pdf(body, sample)
+            # 按原件页码和表格行号索引方向，便于核对两份目录的对应记录。
             cls.rows[mode] = {
                 (chunk["locator"]["page"], chunk["locator"]["row"]): chunk
                 for chunk in chunks if chunk["locator"]["row_type"] == "direction"
@@ -52,6 +53,7 @@ class FullTimeCatalogTest(unittest.TestCase):
         computing = self.rows["全日制"][6, 22]["locator"]
         self.assertEqual(computing["program_code"], "085404")
         cells = computing["cells"]
+        # 科目单元格从专业行跨到方向行，专业人数仍保留在专业层级。
         self.assertEqual(cells["subjects"]["row"], 21)
         self.assertGreaterEqual(cells["subjects"]["bbox"][3], computing["bbox"][3])
         self.assertEqual(cells["program_count"]["text"], "45")

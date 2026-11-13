@@ -24,11 +24,13 @@ def main():
     reports = Path("reports")
     data = Path("data")
     baseline = (reports / "admissions-r3-baseline-prompt.txt").read_text(encoding="utf-8")
+    # 直接重放旧评测的证据，排除当前检索结果变化的影响。
     q3 = saved_question(reports / "admissions-evaluation.jsonl", "Q3")
     q2 = saved_question(reports / "admissions-evaluation-r2.jsonl", "Q2")
     with Store(data / "corpus.sqlite3") as store:
         missing = next(row for row in store.current_chunks()
                        if row["url"].endswith("/8520.htm") and row["ordinal"] == 26)
+    # 只替换一条证据，保留排名和引用编号，便于对照缺证据与补证据的回答。
     supplemented = [
         dict(missing, id=item["id"], rank=item["rank"], context=None)
         if item["rank"] == 5 else item for item in q2["evidence"]
@@ -46,6 +48,7 @@ def main():
     archive = ArchiveCheck(data)
     with args.output.open("x", encoding="utf-8") as output:
         for name, source, evidence, prompt in cases:
+            # 历史证据仍须能定位到原件，才能作为固定实验输入。
             if not all(archive.verify(item) for item in evidence):
                 raise ValueError("Archive verification failed for " + name)
             answer = synthesize(source["question"], evidence, **prompt)

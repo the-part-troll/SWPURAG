@@ -34,6 +34,7 @@ _READER = {
 
 def _query_date(question, today):
     full = list(_FULL_DATE.finditer(question))
+    # 先移除完整日期，避免同一个日期又被识别为省略年份的月日。
     remaining = _FULL_DATE.sub(" ", question)
     partial = list(_MONTH_DAY.finditer(remaining))
     relative = {_RELATIVE[word] for word in _RELATIVE if word in question}
@@ -55,6 +56,7 @@ def _query_date(question, today):
 
 
 def _scope(row):
+    # 文档标记的是总体范围，时刻表行可能另有更窄的馆舍或适用日期。
     fields = ("campus", "building", "notice_kind", "effective_from", "effective_to", "service")
     return dict({key: row.get(key) for key in fields}, **row["locator"].get("library_scope", {}))
 
@@ -89,8 +91,7 @@ def _hours_rows(rows, building, day):
     if temporary:
         return temporary, regular, "temporary"
 
-    # A notice may publish one schedule for multiple buildings but omit one
-    # of them from a particular date row. An omission cannot establish hours.
+    # 总体公告覆盖某馆、当日表格却未列该馆时，保留缺口，避免套用常规时间。
     schedule_documents = {row["document_id"] for row, sc in rows
                           if sc["service"] == "hours" and sc["notice_kind"] == "temporary"}
     covered_by_notice = any(row["document_id"] in schedule_documents and _covers(row, building)
@@ -122,6 +123,7 @@ def search_library(store, question, limit=5, today=None):
     day, date_source, date_error = _query_date(question, today)
     buildings = [name for name, pattern in _BUILDINGS.items() if re.search(pattern, question)]
     machine = bool(_MACHINE.search(question))
+    # 自助借还设备的可用时间与读者借期、续借次数分别取证。
     loan_question = bool(_LOANS.search(_MACHINE.sub("", question)))
     realtime = bool(_REALTIME.search(question))
     reading_hours = bool(_HOURS.search(question)) and not realtime
@@ -175,6 +177,7 @@ def search_library(store, question, limit=5, today=None):
             groups.append(_rank(store, question, primary, 1))
         if not primary and reading_hours:
             gaps.append("现有资料没有{}在所问日期适用的开放时间。".format(building))
+        # 晚间延时只调整截止时间。兼问几点开馆时，才补充常规开馆资料。
         evening_only = primary and all(_scope(row).get("hours_aspect") == "evening_only" for row in primary)
         if evening_only and re.search(r"开馆|开门|几点(?:开|能进)", question):
             groups.append(_rank(store, question, regular, 1))
@@ -193,6 +196,7 @@ def search_library(store, question, limit=5, today=None):
             temporary = [row for row, sc in applicable if sc["notice_kind"] == "temporary" and _active(sc, day)]
             policy = [row for row, sc in applicable if sc["notice_kind"] == "policy"
                       and sc.get("reader_group") in (None, scope["reader_group"])]
+            # 生效的临时安排仅覆盖当前借阅事项，其他事项仍各自查找规则。
             selected = temporary or policy
             if selected:
                 groups.append(_rank(store, question, selected, 1))

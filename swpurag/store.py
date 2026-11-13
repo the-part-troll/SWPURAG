@@ -114,6 +114,7 @@ def library_metadata(sample):
         if day.isoformat() != metadata[field]:
             raise ValueError(field + " must be a valid YYYY-MM-DD date")
 
+    # 日期区间包含起止两天。缺省日期表示来源未明确标注。
     if "effective_from" in metadata and "effective_to" in metadata:
         if metadata["effective_from"] > metadata["effective_to"]:
             raise ValueError("effective_from cannot be after effective_to")
@@ -129,7 +130,7 @@ def _capture_instant(value):
         raise ValueError("Capture time must be an ISO timestamp with a UTC offset")
     if value.endswith("Z"):
         value = value[:-1] + "+00:00"
-    # Python 3.7 accepts three or six fractional digits in fromisoformat.
+    # Python 3.7 的 fromisoformat 只接受三位或六位小数秒。
     value = re.sub(r"\.(\d{1,6})(?=[+-])", lambda match: "." + match[1].ljust(6, "0"), value)
     try:
         timestamp = datetime.fromisoformat(value)
@@ -159,7 +160,7 @@ class Store:
         self.db.close()
 
     def _migrate(self):
-        # Keep the old version identifiers, hashes and paragraph citations.
+        # 迁移沿用现有版本编号、哈希和段落出处。
         columns = {
             "documents": {"latest_success_fetched_at": "TEXT"},
             "versions": {
@@ -200,7 +201,7 @@ class Store:
             try:
                 instant = _capture_instant(row["fetched_at"])
             except ValueError:
-                # Legacy records without a usable absolute time cannot establish recency.
+                # 旧记录缺少有效时区时，无法确定它与其他抓取记录的先后。
                 continue
             document_id = row["document_id"]
             if document_id not in latest or instant >= latest[document_id][0]:
@@ -258,8 +259,7 @@ class Store:
         raw_path = str(raw_path)
         url = sample["url"]
         with self.db:
-            # Lock before looking up the current version so simultaneous imports
-            # cannot both decide to create the same document or version.
+            # 先加写锁再读当前版本，避免并行导入依据同一旧状态决定新增。
             self.db.execute("BEGIN IMMEDIATE")
             source_id = self._source_id(sample)
             document = self.db.execute(
@@ -282,6 +282,7 @@ class Store:
                 document_id = document["id"]
                 current_version_id = document["current_version_id"]
                 latest_fetched_at = document["latest_success_fetched_at"]
+            # 按成功抓取的时间推进当前版本。较早的快照仍可补入历史。
             is_latest = latest_fetched_at is None or instant >= _capture_instant(latest_fetched_at)
 
             version = self.db.execute(
@@ -322,6 +323,7 @@ class Store:
                     "SELECT COUNT(*) FROM chunks WHERE version_id = ?", (version_id,),
                 ).fetchone()[0]
 
+            # 同内容的新抓取也推进最新成功时间，原版本及其引用保持可追溯。
             if is_latest:
                 self.db.execute(
                     """

@@ -82,6 +82,7 @@ class LibraryMetadataTest(unittest.TestCase):
         with Store(":memory:") as store:
             original = self.ingest(store, sample)
             self.assertEqual(original["status"], "new", original)
+            # 重用同一份网页，分别变更通知有效期和正文块适用范围。
             updated = self.ingest(store, dict(sample, effective_to="2026-12-19"))
             self.assertEqual(updated["status"], "updated", updated)
             scoped = copy.deepcopy(dict(sample, effective_to="2026-12-19"))
@@ -111,13 +112,14 @@ class LibraryMetadataTest(unittest.TestCase):
         raw = (DATA / receipt["raw_path"]).read_bytes()
         title, chunks, dates = extract_document(raw, receipt.get("charset"), sample)
         version_sample = dict(sample, **dates)
-        # This digest predates the library columns and was independently saved from the first corpus.
+        # 此哈希来自新增图书馆字段之前的语料，用于验证旧版本标识保持稳定。
         digest = "76742f315a46cf6a0b1d4de663bf92e3c13718113ff69f16b1705f38f1fdd354"
         self.assertEqual(content_hash(version_sample, title, chunks), digest)
         self.assertEqual(content_hash(dict(version_sample, topic=None, building=" "), title, chunks), digest)
 
         with tempfile.TemporaryDirectory(prefix=".test-library-migration-", dir=str(ROOT)) as directory:
             path = Path(directory) / "old.sqlite3"
+            # 去掉新增列，预置一份带原件和定位的历史记录，再由 Store 打开迁移。
             schema = SCHEMA
             for field in LIBRARY_FIELDS:
                 schema = schema.replace("    " + field + " TEXT,\n", "")

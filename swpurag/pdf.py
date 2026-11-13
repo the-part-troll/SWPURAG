@@ -11,6 +11,7 @@ _PROGRAM = re.compile(r"^([0-9]{4}[0-9A-Z][0-9])(?![0-9A-Za-z])\S[^\n]*$")
 _DIRECTION = re.compile(r"^(\d{2})\((非全日制|全日制)\)\S[^\n]*$")
 _NAME_COLUMN = ("name", "学院、专业、研究方向")
 _DETAIL_COLUMNS = (("duration", "学制"), ("subjects", "考试科目"), ("remarks", "备注"))
+# 用实际表头区分目录，避免混淆全日制含推免与非全日制不含单考的人数口径。
 _LAYOUTS = {
     "非全日制": (_NAME_COLUMN, ("count", "拟招生非全日制人数(不含单考)")) + _DETAIL_COLUMNS,
     "全日制": (
@@ -79,14 +80,13 @@ def _catalog_rows(page, table_number, table, values, header, mode):
                 previous[column] = own[column]
             elif previous[column] is not None:
                 x, top, _, end = previous[column]["bbox"]
-                # A continuation inherits only from an actual spanning cell.
-                # An explicitly empty cell and a new page both reset it.
+                # 只有合并格的坐标确实覆盖当前行才继承，空格和换页都会中断继承。
                 if abs(x - column_x[column]) <= 0.01 and top < row_top and end + 0.01 >= row_bottom:
                     effective[column] = previous[column]
 
         first = own[0]
         if first is None or boxes[0][2] >= right - 0.01:
-            continue  # Full-width notes cannot start or change a program.
+            continue  # 跨全表的说明行不改变当前专业归属。
         name = _compact(first["text"])
         if _COLLEGE.fullmatch(name):
             college = first
@@ -114,11 +114,11 @@ def _catalog_rows(page, table_number, table, values, header, mode):
             ("program", "专业", program),
             ("direction", "研究方向", first),
         ]
+        # 专业与方向人数分别取自各自的行，方向格留空时不沿用专业合计。
         for key in count_fields:
             fields.append(("direction_" + key, "方向" + labels[key], own[columns[key]]))
             fields.append(("program_" + key, "专业" + labels[key], program_counts[key]))
-        # The project column can span multiple programs. Its layout does not
-        # establish a project assignment for a specific research direction.
+        # 联合培养列可跨多个专业，不能据此认定某个方向参加该项目。
         fields.extend(details)
         yield {
             "text": "\n".join(label + "：" + cell["text"] for _, label, cell in fields if cell),

@@ -50,11 +50,13 @@ class TreeParser(HTMLParser):
         self.stack = [self.root]
 
     def handle_starttag(self, tag, attrs):
+        # HTML 允许省略段落结束标签，连续段落仍按同级节点定位。
         if tag == "p" and self.stack[-1].tag == "p":
             self.stack.pop()
         parent = self.stack[-1]
         parent.tag_counts[tag] += 1
         line, column = self.getpos()
+        # 出处行列都从 1 开始，列号按解码后的字符计数。
         node = Element(tag, attrs, line, column + 1, parent.tag_counts[tag])
         parent.children.append(node)
         if tag not in VOID:
@@ -118,6 +120,7 @@ def find_region(nodes, selector):
 
 def blocks(node, selector):
     descendants = list(elements(node))[1:]
+    # 有结构的容器继续向内分块，避免把整块模板与子段落同时索引。
     is_leaf = node.tag in CONTAINERS and not any(
         child.tag in BLOCKS or child.tag in CONTAINERS for child in descendants
     )
@@ -152,6 +155,7 @@ def decode_html(body, charset):
 
 
 def validate_body(region, chunks, sample):
+    # 状态码为 200 时仍可能收到半截正文、登录或维护页。
     if not region.closed and region.tag in {"div", "article", "section", "main"}:
         raise ValueError("Body region is incomplete: closing tag missing")
     if not chunks:
@@ -203,6 +207,7 @@ def extract(body, charset, sample):
         raise ValueError("Missing title or page indicates an access or verification error")
 
     chunks = []
+    # 同一页面的不同馆舍容器可各自带适用范围。
     sections = sample.get("body_sections") or [{"selector": sample.get("body_selector")}]
     for section in sections:
         selector = section["selector"]
@@ -213,6 +218,7 @@ def extract(body, charset, sample):
             for chunk in extracted:
                 chunk["locator"]["library_scope"] = dict(section["scope"])
         chunks.extend(extracted)
+    # 段落标记须唯一命中，避免网页变动后把馆舍或有效期贴错位置。
     for assignment in sample.get("chunk_scopes", []):
         matching = [chunk for chunk in chunks if all(
             marker in chunk["text"] for marker in assignment["contains"]

@@ -31,6 +31,7 @@ class LibraryScopeTest(unittest.TestCase):
         cls.store.db.close()
 
     def search(self, question):
+        # 固定参考日，确保相对日期和省略年份的查询可以重复验证。
         return search_library(self.store, question, 5, today="2026-11-13")
 
     def test_temporary_end_date_is_inclusive(self):
@@ -47,6 +48,7 @@ class LibraryScopeTest(unittest.TestCase):
         self.assertTrue(all("22:30" not in hit["text"] for hit in hits))
 
     def test_summer_row_does_not_establish_branch_hours(self):
+        # 暑假此段仅列总馆，分别验证查分馆、未指定馆舍和查总馆的结果。
         hits, scope = self.search("2026年8月1日成都分馆几点关门？")
         self.assertFalse(hits)
         self.assertTrue(scope["unsupported"])

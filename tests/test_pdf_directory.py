@@ -26,6 +26,7 @@ class PdfDirectoryTest(unittest.TestCase):
         cls.sample = next(item for item in manifest if item["id"] == SAMPLE_ID)
         cls.receipt = next(item for item in receipts if item["url"] == cls.sample["url"])
         cls.data_dir = ROOT / "data"
+        # 用真实归档走完整导入流程，测试版本及失败记录只保存在内存库。
         cls.store = Store(":memory:")
         cls.addClassCleanup(cls.store.db.close)
         result = import_capture(cls.store, cls.sample, cls.receipt, cls.data_dir)
@@ -55,6 +56,7 @@ class PdfDirectoryTest(unittest.TestCase):
         row = self.find(3, "125601", "不区分研究方向", "199管理类综合能力", "204英语二")
         archive = ArchiveCheck(self.data_dir)
         self.assertTrue(archive.verify(row))
+        # 保留原文和其他定位信息，只改页码，验证错误页码无法通过核验。
         self.assertFalse(archive.verify(dict(row, locator=dict(row["locator"], page=2))))
         output = io.StringIO()
         with redirect_stdout(output):
