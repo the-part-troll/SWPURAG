@@ -19,6 +19,9 @@ ACCEPTANCE = Path("samples/routing-acceptance.json")
 ACCEPTANCE_SHA256 = "f043d2d3c808ed7d214491714739af737ecf7ede671abe8eb36e0e86b4c423e7"
 BOUNDARY = Path("samples/boundary-acceptance.json")
 BOUNDARY_SHA256 = "79ad3456470990c27bb4258e33f9dd5077544da0a814a97dd6f2fe4b0cd2801c"
+DISCOVERY = Path("samples/discovery/acceptance.json")
+DISCOVERY_SHA256 = "c6ad2abb5782fc613a3c4f223ee44a029000a23d6abc1094fe5bb04860759cce"
+DISCOVERY_MANIFESTS = [(Path("samples/discovery/pages.json"), Path("samples/discovery/captures.json"))]
 
 
 def load_baseline(path):
@@ -34,11 +37,11 @@ def load_baseline(path):
     return modules["swpurag.answer"].prepare_retrieval
 
 
-def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=()):
+def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), discovery=(), archive=None):
     rows = list(store.current_chunks())
-    if (store.stats()["documents"], len(rows)) != (13, 747):
+    if archive is None and (store.stats()["documents"], len(rows)) != (13, 747):
         raise ValueError("The routing comparison requires the original 13 documents and 747 blocks")
-    archive = ArchiveCheck(Path("data"))
+    archive = archive or ArchiveCheck(Path("data"))
     samples = {row["id"]: row["url"] for row in archive.samples.values()}
     by_url = {url: sample for sample, url in samples.items()}
     rows_by_id = {row["chunk_id"]: row for row in rows}
@@ -50,9 +53,12 @@ def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=()):
     validate_labels(acceptance, rows, samples, archive, size=(6, 8))
     if boundary:
         validate_labels(boundary, rows, samples, archive, size=(6, 8))
+    if discovery:
+        validate_labels(discovery, rows, samples, archive, size=(6, 8))
     suite_by_id = {q["id"]: suite for suite, dataset in
-                   (("routing-acceptance", acceptance), ("boundary-acceptance", boundary)) for q in dataset}
-    for q in frozen + old + acceptance + list(boundary):
+                   (("routing-acceptance", acceptance), ("boundary-acceptance", boundary),
+                    ("discovery-acceptance", discovery)) for q in dataset}
+    for q in frozen + old + acceptance + list(boundary) + list(discovery):
         start = time.perf_counter()
         trace = {}
         evidence, topics, scopes = prepare(store, q["question"], limit=LIMIT, trace=trace)
@@ -98,7 +104,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--baseline-source", type=Path, help="trusted pre-fix source files")
     parser.add_argument("--boundary", action="store_true", help="include the frozen boundary acceptance set")
+    parser.add_argument("--db", type=Path, default=Path("data/corpus.sqlite3"))
+    parser.add_argument("--discovery", action="store_true", help="include the frozen discovery acceptance set")
     args = parser.parse_args()
+    if args.discovery and args.db.resolve() == Path("data/corpus.sqlite3").resolve():
+        parser.error("the discovery suite requires --db for an isolated validation database")
+    if not args.db.is_file():
+        parser.error("database does not exist")
     raw = ACCEPTANCE.read_bytes().replace(b"\r\n", b"\n")
     if hashlib.sha256(raw).hexdigest() != ACCEPTANCE_SHA256:
         parser.error("acceptance file differs from the frozen questions")
@@ -110,8 +122,15 @@ def main():
             parser.error("boundary file differs from the frozen questions")
         boundary = read_json(BOUNDARY)
     prepare = load_baseline(args.baseline_source) if args.baseline_source else prepare_retrieval
-    with Store(Path("data/corpus.sqlite3")) as store, args.output.open("x", encoding="utf-8") as output:
-        run(store, output, acceptance, prepare, boundary=boundary)
+    discovery = ()
+    if args.discovery:
+        raw = DISCOVERY.read_bytes().replace(b"\r\n", b"\n")
+        if hashlib.sha256(raw).hexdigest() != DISCOVERY_SHA256:
+            parser.error("discovery file differs from the frozen questions")
+        discovery = read_json(DISCOVERY)
+    archive = ArchiveCheck(Path("data"), extra_manifests=DISCOVERY_MANIFESTS) if args.discovery else None
+    with Store(args.db) as store, args.output.open("x", encoding="utf-8") as output:
+        run(store, output, acceptance, prepare, boundary=boundary, discovery=discovery, archive=archive)
     print("Saved", args.output)
 
 

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "masters-sichuan-registration-reminder-2027",
+    "url": "https://www.swpu.edu.cn/gs/info/1074/8760.htm",
+    "source_key": "graduate-admissions-notices",
+    "host": "www.swpu.edu.cn",
+    "path_prefix": "/gs/info/1074/",
+    "unit": "西南石油大学研究生院招生办公室（转载）",
+    "page_type": "硕士研究生四川网报与材料审核提示",
+    "body_selector": "#vsb_content",
+    "minimum_body_chars": 450,
+    "date_labels": {"published_at": "日期"},
+    "admission_year": 2027,
+    "role": "provincial_general",
+    "audience": "参加2027年全国硕士研究生招生考试四川省网上报名的考生"
+  },
+  {
+    "id": "masters-sichuan-registration-faq-2027",
+    "url": "https://www.swpu.edu.cn/gs/info/1074/8710.htm",
+    "source_key": "graduate-admissions-notices",
+    "host": "www.swpu.edu.cn",
+    "path_prefix": "/gs/info/1074/",
+    "unit": "西南石油大学研究生院招生办公室（转载）",
+    "page_type": "四川省硕士研究生网报问题解读",
+    "body_selector": "#vsb_content",
+    "minimum_body_chars": 2500,
+    "date_labels": {"published_at": "日期"},
+    "admission_year": 2027,
+    "role": "provincial_general",
+    "audience": "参加2027年全国硕士研究生招生考试四川省网上报名的考生，各报考点的具体受理条件另行核对",
+    "exclude_blocks": [
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(46)", "contains": "少数民族高层次骨干人才计划的考生如何进行资格审核？"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(47)", "contains": "少数民族高层次骨干人才计划管理平台"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(48)", "contains": "资格审核未完成的情况下"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(49)", "contains": "为报考该计划的考生预留充足考位"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(54)", "contains": "享受考研加分、照顾、免初试政策应该如何申请？"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(55)", "contains": "申请享受少数民族照顾政策的资格"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(56)", "contains": "退役大学生士兵专项计划的条件是什么？"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(57)", "contains": "士兵专项计划和加分照顾政策不能同时享受"}
+    ]
+  }
+]

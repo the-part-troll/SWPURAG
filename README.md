@@ -56,6 +56,8 @@ python -B -m swpurag serve --port 8765
 
 5110 考点的来源范围、退费取证和暑期归还边界见 [规则边界复审](reports/boundary-regression.md)。
 
+从招生通知首页发现候选、归档并在独立库复测的命令与结果见 [栏目采集试验](reports/discovery-validation.md)。
+
 ## 工作区
 
 | 位置 | 用途 |

@@ -3,7 +3,9 @@
 import json
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
+from swpurag.answer import AnswerError, answer_question
 from swpurag.ingest import import_capture
 from swpurag.library_scope import search_library
 from swpurag.store import Store
@@ -19,13 +21,56 @@ class LibraryReturnDatesTest(unittest.TestCase):
         cls.store = Store(":memory:")
         cls.addClassCleanup(cls.store.db.close)
         for sample in manifest:
-            if sample["id"] in {"library-chengdu-2026-summer-schedule", "library-chengdu-reader-guide"}:
+            if sample["id"] in {"library-chengdu-2026-summer-schedule", "library-chengdu-reader-guide",
+                                "library-chengdu-loan-rights"}:
                 result = import_capture(cls.store, sample, by_url[sample["url"]], root / "data")
                 if result["status"] != "new":
                     raise AssertionError(result)
 
     def search(self, question):
         return search_library(self.store, question, 5, today="2026-11-13")
+
+    def test_overlap_subquestion_does_not_hide_supported_renewal(self):
+        returned = ("我从成都二期图书馆借的书原本2026年7月11日到期，打算9月6日归还。"
+                    "按那份暑期通知，这本书算不算超期？")
+        question = returned + "另外，我是研究生，图书最多可以续借几次？"
+        quote = "可续借2次，每次续借期30天"
+
+        def model(text, evidence, _prompt, _subquestions, scope):
+            self.assertEqual(text, "另外，我是研究生，图书最多可以续借几次？")
+            self.assertNotIn("loan_dates", scope)
+            self.assertEqual(scope["reader_group"], "graduate")
+            self.assertEqual(len(evidence), 1)
+            self.assertEqual(evidence[0]["library_scope"]["loan_aspect"], "renewal_rule")
+            return "fixture", {"status": "answered", "follow_up": "", "claims": [{
+                "text": "研究生可续借2次。", "citations": [{"id": evidence[0]["id"], "quote": quote}],
+            }]}
+
+        with patch("swpurag.answer.request_model", side_effect=model) as request:
+            result = answer_question(self.store, question, "scoped")
+        request.assert_called_once()
+        self.assertEqual(result["status"], "insufficient")
+        self.assertEqual([part["status"] for part in result["parts"]], ["insufficient", "answered"])
+        self.assertEqual(result["parts"][0]["question"], returned)
+        self.assertEqual(result["parts"][0]["claims"], result["claims"][:2])
+        self.assertEqual(len(result["claims"]), 3)
+        locations = {row["id"]: row["locator"]["library_scope"]["loan_aspect"] for row in result["evidence"]}
+        self.assertEqual([locations[claim["citations"][0]["id"]] for claim in result["claims"]],
+                         ["holiday_return", "holiday_return", "renewal_rule"])
+        self.assertIn("向图书馆核对", result["follow_up"])
+
+        with patch("swpurag.answer.request_model", side_effect=AnswerError("模型连接失败")):
+            failed = answer_question(self.store, question, "scoped")
+        self.assertEqual(failed["status"], "unavailable")
+        self.assertEqual(failed["claims"], result["parts"][0]["claims"])
+        self.assertEqual(failed["parts"][1]["status"], "unavailable")
+
+        with patch("swpurag.answer.request_model") as request:
+            unclear = answer_question(self.store, returned + "另外，图书最多可以续借几次？", "scoped")
+        request.assert_not_called()
+        self.assertEqual(unclear["claims"], result["parts"][0]["claims"])
+        self.assertEqual(unclear["parts"][1]["status"], "clarify")
+        self.assertIn("读者属于哪一类", unclear["parts"][1]["follow_up"])
 
     def test_deadline_is_inclusive_and_return_date_does_not_filter_evidence(self):
         cases = [

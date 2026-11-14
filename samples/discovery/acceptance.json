@@ -1,0 +1,82 @@
+[
+  {
+    "id": "N01",
+    "question": "四川考生 2027 考研网报的证件照，我能把手机相册里的现成照片传上去吗？拍摄背景有要求吗？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "必须通过学信网 APP 在线拍摄上传", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 15}]},
+      {"label": "背景统一为白色", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 16}]}
+    ],
+    "wrong_scope": []
+  },
+  {
+    "id": "N02",
+    "question": "四川 2027 考研网报填完信息以后，还要像以前那样等一个独立的网上确认阶段才上传材料吗？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "网报与网上确认一体化，不再设独立确认阶段", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 7}]},
+      {"label": "照片采集和材料上传合并至网报期间", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 8}]}
+    ],
+    "wrong_scope": []
+  },
+  {
+    "id": "N03",
+    "question": "四川 2027 硕士预报名我只做了一部分，正式报名开了以后，是要从头来过还是接着把剩下的步骤做完？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "预报名仅完成部分流程者可在正式报名阶段接着完成", "alternatives": [{"sample": "masters-sichuan-registration-reminder-2027", "paragraph": 7}]}
+    ],
+    "wrong_scope": [],
+    "notes": "只针对部分完成者。已完成者无需重复报名的段落可以出现，但不能单独回答。"
+  },
+  {
+    "id": "N04",
+    "question": "研招办转发的四川 2027 网报温馨提示里，报考材料的第一轮审核最迟什么时候完成？被要求补材料的话，我最晚什么时候传？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "首轮审核 10 月 30 日 12:00 前，考生补交 10 月 31 日 12:00 前", "alternatives": [{"sample": "masters-sichuan-registration-reminder-2027", "paragraph": 11}]}
+    ],
+    "wrong_scope": [],
+    "notes": "10 月 31 日 17:00 是材料审核安排的结束时间，不能当作考生提交的截止时间。"
+  },
+  {
+    "id": "N05",
+    "question": "我考外校的 2027 硕士，准备选西南石油大学 5110。一科初试要考四小时，能选这个点吗？四川网报照片是不是要用学信网 APP 在线拍？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "5110 不接收一门初试超过三小时的考生", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 27}]},
+      {"label": "四川网报照片须通过学信网 APP 在线拍摄上传", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 15}]}
+    ],
+    "wrong_scope": [{"sample": "masters-admissions-unit-10615-2027"}],
+    "notes": "外校考生同时问 5110 限制和四川通用流程，不能只用 10615 公告，也不能把 5110 限制扩为全省规则。"
+  },
+  {
+    "id": "N06",
+    "question": "四川 2027 考研答疑说符合条件可以全省选点。我报的是别的学校，招生单位要求初试用画板，这是不是意味着也能选西南石油大学本部 5110？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "可在全省选满足报名条件的考点，部分考点有限制", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 31}]},
+      {"label": "5110 不接收初试须使用画板类的考生", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 27}]}
+    ],
+    "wrong_scope": [{"sample": "masters-admissions-unit-10615-2027"}]
+  },
+  {
+    "id": "N07",
+    "question": "我在四川报考 2027 年硕士，材料页现在显示待补充。我没有提供具体报名信息，能告诉我个人还缺哪份材料、提交后几点能通过吗？",
+    "expected_topics": ["admissions"], "expected_status": "insufficient", "expected_answer_status": "insufficient",
+    "required": [
+      {"label": "待补充只能说明材料缺失，须按考点要求补材料；公告不能给出个人缺件和通过时间", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 21}]}
+    ],
+    "wrong_scope": [],
+    "notes": "可解释状态或流程，明确缺少个人审核结果。不能凭公共时限推断个人缺件或通过时间。"
+  },
+  {
+    "id": "N08",
+    "question": "我在四川报名参加 2027 年研考，需要考场提供合理便利。是直接找我要报的学校，还是报名成功以后找报考点？要交什么？",
+    "expected_topics": ["admissions"], "expected_status": "evidence", "expected_answer_status": "answered",
+    "required": [
+      {"label": "报名成功后主动联系所在报考点，按要求交申请表和相关证明材料", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 51}]}
+    ],
+    "wrong_scope": []
+  }
+]

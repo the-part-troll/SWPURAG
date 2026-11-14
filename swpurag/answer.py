@@ -10,7 +10,7 @@ from urllib.request import Request, build_opener
 
 from .capture import NoRedirect
 from .catalog_scope import search_scoped
-from .library_scope import search_library
+from .library_scope import search_library, split_library_return_question
 from .retrieval import explicit_subquestions, search_admission_question
 from .topics import interleave_hits, topic_questions
 
@@ -345,6 +345,49 @@ def library_return_policy(policy, evidence):
     return dict(validate_answer(answer, evidence), answer_origin="scope_check")
 
 
+def answer_library(question, scope, evidence):
+    prompt = SYSTEM_PROMPT.replace("2027 年普通硕士招生", "成都校区图书馆服务", 1) + LIBRARY_PROMPT
+    if scope.get("no_applicable_extension"):
+        prompt += ("\n问题问延时是否适用，而检索仅找到常规开放。先直接说明归档的延时安排"
+                   "没有覆盖查询日期。只引用常规时段，不推断是否另有未收录的通知。")
+    gaps = " ".join(scope.get("unsupported") or [])
+    if gaps and not evidence:
+        return {"status": "insufficient", "claims": [], "follow_up": gaps, "answer_origin": "scope_check"}
+    result = synthesize(question, evidence, prompt, query_scope=scope)
+    if gaps and result["status"] == "answered":
+        result.update(status="insufficient", follow_up=gaps)
+    return result
+
+
+def _library_overlap_answer(question, scope, evidence):
+    policy = scope["return_policy"]
+    returned, other = split_library_return_question(question)
+    boundary = library_return_policy(policy, evidence)
+    if not other:
+        return boundary
+
+    # 另一子问沿用已筛选的证据，公告中的还书日期和引文都只归还书子问。
+    other_evidence = [row for row in evidence if row["chunk_id"] != policy["chunk_id"]
+                      and row.get("locator", {}).get("library_scope", {}).get("loan_aspect") != "holiday_return"]
+    other_scope = {key: value for key, value in scope.items()
+                   if key not in {"loan_dates", "return_policy", "date", "date_source"}}
+    if scope.get("clarification"):
+        rest = {"status": "clarify", "claims": [], "follow_up": scope["clarification"],
+                "answer_origin": "scope_check"}
+    elif not other_evidence:
+        rest = {"status": "insufficient", "claims": [],
+                "follow_up": "本轮未找到适用于这一子问的证据。", "answer_origin": "scope_check"}
+    else:
+        rest = answer_library(other, other_scope, other_evidence)
+    return {
+        "status": "unavailable" if rest["status"] == "unavailable" else "insufficient",
+        "claims": boundary["claims"] + rest["claims"],
+        "follow_up": " ".join(value for value in (boundary["follow_up"], rest.get("follow_up")) if value),
+        "parts": [dict(boundary, question=returned, id=1), dict(rest, question=other, id=2)],
+        **{key: rest[key] for key in ("error", "model") if key in rest},
+    }
+
+
 def answer_question(store, question, method="natural", limit=5):
     question = question.strip()
     evidence, questions, scopes = prepare_retrieval(store, question, method, limit)
@@ -353,27 +396,18 @@ def answer_question(store, question, method="natural", limit=5):
         scope = scopes[topic]
         # 各主题独立作答，引用校验也只接收该主题的证据。
         relevant = [item for item in evidence if item["evidence_topic"] == topic]
-        gaps = " ".join(scope.get("unsupported") or [])
         # 能确定范围歧义或证据缺口时，直接给出追问或说明。
-        if scope.get("clarification"):
+        return_policy = scope.get("return_policy", {})
+        if topic == "library" and return_policy.get("kind") == "overlap":
+            result = _library_overlap_answer(text, scope, relevant)
+        elif scope.get("clarification"):
             result = {"status": "clarify", "claims": [], "follow_up": scope["clarification"],
                       "answer_origin": "scope_check"}
-        elif topic == "library" and gaps and not relevant:
-            result = {"status": "insufficient", "claims": [], "follow_up": gaps,
-                      "answer_origin": "scope_check"}
         elif topic == "library":
-            return_policy = scope.get("return_policy", {})
-            rule = return_policy.get("kind")
-            if rule == "overlap" or (rule == "carryover" and len(relevant) == 1 and not gaps):
+            if return_policy.get("kind") == "carryover" and len(relevant) == 1 and not scope.get("unsupported"):
                 result = library_return_policy(return_policy, relevant)
             else:
-                prompt = SYSTEM_PROMPT.replace("2027 年普通硕士招生", "成都校区图书馆服务", 1)
-                if scope.get("no_applicable_extension"):
-                    prompt += ("\n问题问延时是否适用，而检索仅找到常规开放。先直接说明归档的延时安排"
-                               "没有覆盖查询日期。只引用常规时段，不推断是否另有未收录的通知。")
-                result = synthesize(text, relevant, prompt + LIBRARY_PROMPT, query_scope=scope)
-                if gaps and result["status"] == "answered":
-                    result.update(status="insufficient", follow_up=gaps)
+                result = answer_library(text, scope, relevant)
         else:
             result = synthesize(text, relevant, subquestions=explicit_subquestions(text))
         parts[topic] = result

@@ -22,13 +22,12 @@ def compact(value):
 
 
 class ArchiveCheck:
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, *, extra_manifests=()):
         self.data_dir = data_dir
-        self.samples = {row["url"]: row for row in read_json(Path("samples/pages.json"))}
-        self.charsets = {
-            row["raw_sha256"]: row.get("charset")
-            for row in read_json(Path("samples/captures.json")) if "raw_sha256" in row
-        }
+        manifests = [(Path("samples/pages.json"), Path("samples/captures.json")), *extra_manifests]
+        self.samples = {row["url"]: row for pages, _ in manifests for row in read_json(pages)}
+        self.charsets = {row["raw_sha256"]: row.get("charset") for _, captures in manifests
+                         for row in read_json(captures) if "raw_sha256" in row}
         self.cache = {}
 
     def verify(self, evidence):

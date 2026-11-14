@@ -229,6 +229,19 @@ def extract(body, charset, sample):
     for paragraph, chunk in enumerate(chunks, 1):
         chunk["locator"]["paragraph"] = paragraph
 
+    # 排除已确认不适用的段落，原件仍完整保留，后续段落继续使用原编号。
+    excluded = set()
+    for rule in sample.get("exclude_blocks", []):
+        selector, marker = rule["selector"], rule["contains"]
+        matching = [i for i, chunk in enumerate(chunks) if chunk["locator"]["selector"] == selector
+                    and marker and marker in chunk["text"]]
+        if len(matching) != 1 or matching[0] in excluded:
+            raise ValueError("Expected one distinct excluded HTML block at " + selector)
+        excluded.add(matching[0])
+    chunks = [chunk for i, chunk in enumerate(chunks) if i not in excluded]
+    if not chunks:
+        raise ValueError("No HTML evidence remains after configured exclusions")
+
     dates = {}
     if sample.get("date_labels"):
         visible = plain_text(tree.root)

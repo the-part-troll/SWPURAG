@@ -34,6 +34,9 @@ _RELATIVE_DATE = re.compile("|".join(_RELATIVE))
 _YEAR = re.compile(r"(?<!\d)(\d{4})\s*年(?!度)")
 _HOLIDAY_RETURN = re.compile(r"寒假|暑假|暑期|假期|顺延|延期|超期|还书日")
 _RETURN_CONTEXT = re.compile(r"归还|还书|超期|到期|应还|该还")
+_RETURN_SUBQUESTION_BREAK = re.compile(
+    r"(?<=[。！？；!?;])|[，,]\s*(?=另外|还有|还想问|再问)"
+)
 _RETURN_CASE = re.compile(r"(?:这|那)本|我的书|今年|去年|明年|(?:这|那|本)次|(?:本|下)周")
 _RETURN_CHECK = re.compile(r"算(?:不算)?超期|(?:会不会|会|是否|有没有)超期")
 _DEADLINE_QUESTION = re.compile(r"最迟|最晚|哪(?:天|日)|何时|什么时候|几点")
@@ -236,6 +239,22 @@ def _loan_aspects(question):
     if not aspects or rule:
         aspects.append("renewal_rule")
     return aspects
+
+
+def split_library_return_question(question):
+    """Separate explicit companion questions after a holiday return rule was matched."""
+    returned, other = [], []
+    for clause in _RETURN_SUBQUESTION_BREAK.split(question):
+        normalized = _search_text(clause)
+        return_clause = _RETURN_CONTEXT.search(normalized)
+        independent = _LOANS.search(normalized) or _HOURS.search(normalized) or _REALTIME.search(normalized)
+        if independent and not return_clause:
+            other.append(clause.strip())
+        else:
+            returned.append(clause.strip())
+    if returned and other:
+        return "".join(returned), "".join(other)
+    return question, ""
 
 
 def search_library(store, question, limit=5, today=None, *, ranker=None, trace=None):

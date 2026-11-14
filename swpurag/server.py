@@ -101,6 +101,8 @@ def clean_answer(result):
         result["error"] = MODEL_UNAVAILABLE
     for part in result.get("topic_answers", {}).values():
         clean_answer(part)
+    for part in result.get("parts", ()):
+        clean_answer(part)
 
 
 class Handler(BaseHTTPRequestHandler):
