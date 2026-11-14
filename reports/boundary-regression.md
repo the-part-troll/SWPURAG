@@ -49,17 +49,19 @@ H08 的 Top 5 只命中收费行，仍按原冻结口径记为未找齐。记录
 
 ## 运行命令
 
-先激活环境。当前库存在时可直接评测。修复前源码可由提交 `96c1cdd` 提取。当前工作区也保留了 `data/local/boundary-baseline/` 副本。复跑请用新输出文件名。
+先激活环境，复跑时显式选择原来默认的 13 篇语料。修复前源码可由提交 `96c1cdd` 提取。当前工作区也保留了 `data/local/boundary-baseline/` 副本。复跑请用新输出文件名。
 
 ```powershell
 Set-Location 'P:\SWPURAG'
 conda activate SWPU_RAG
 $env:PYTHONIOENCODING = 'utf-8'
 New-Item -ItemType Directory -Force data/local | Out-Null
+$old = 'data/local/corpus-13-replay.sqlite3'
+if (-not (Test-Path -LiteralPath $old)) { python -B -m swpurag --db $old import }
 git archive --format=zip --output=data/local/boundary-baseline-source.zip 96c1cdd swpurag/answer.py swpurag/topics.py swpurag/library_scope.py swpurag/catalog_scope.py swpurag/retrieval.py
 Expand-Archive -LiteralPath data/local/boundary-baseline-source.zip -DestinationPath data/local/boundary-baseline-source
-python -B -m swpurag.routing_eval --boundary --baseline-source data/local/boundary-baseline-source/swpurag --output reports/boundary-before-repeat.jsonl
-python -B -m swpurag.routing_eval --boundary --output reports/boundary-after-repeat.jsonl
+python -B -m swpurag.routing_eval --db $old --boundary --baseline-source data/local/boundary-baseline-source/swpurag --output reports/boundary-before-repeat.jsonl
+python -B -m swpurag.routing_eval --db $old --boundary --output reports/boundary-after-repeat.jsonl
 python -B -m unittest discover -s tests -v
 ```
 
@@ -74,6 +76,6 @@ $ids = @('H04', 'H05', 'H06', 'H08', 'H21') + (1..8 | ForEach-Object { 'B{0:00}'
 New-Item -ItemType Directory -Force reports/local | Out-Null
 foreach ($id in $ids) {
   $question = ($questions | Where-Object id -eq $id).question
-  python -B -m swpurag ask $question --json | Out-File -NoClobber -Encoding utf8 "reports/local/boundary-$id-repeat.json"
+  python -B -m swpurag --db $old ask $question --json | Out-File -NoClobber -Encoding utf8 "reports/local/boundary-$id-repeat.json"
 }
 ```

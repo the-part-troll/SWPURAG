@@ -1,6 +1,6 @@
 # 西南石油大学官网 RAG
 
-2026-11-12 建立。同一问答入口支持西南石油大学 **2027 年普通硕士招生**和**成都校区图书馆服务**。当前样本库有 **13 篇文档、747 个正文块**，包含两份招生目录 PDF 和五份图书馆官网原件。校情、公告和教师简介仍可用通用检索查询。
+2026-11-12 建立。同一问答入口支持西南石油大学 **2027 年普通硕士招生**和**成都校区图书馆服务**。默认库有 **15 篇文档、813 个正文块**，包含两份四川网报资料、两份招生目录 PDF 和五份图书馆官网原件。校情、公告和教师简介可用通用检索查询。
 
 ## 环境配置
 
@@ -19,11 +19,12 @@ python --version
 
 模型读取当前进程的 `SWPURAG_API_KEY`，使用 DeepSeek 官方地址时也接受 `DEEPSEEK_API_KEY`。可选 `SWPURAG_BASE_URL` 和 `SWPURAG_MODEL`，默认是 `https://api.deepseek.com` 和 `deepseek-flash`。将密钥设在本地环境变量中，或使用[本地密钥加载示例](reports/admissions-evaluation.md)。
 
+首次使用请先离线重建默认库，再运行下列问答示例。[重建命令](#运行方式)
+
 ```powershell
 Set-Location 'P:\SWPURAG'
 conda activate SWPU_RAG
 $env:PYTHONIOENCODING = 'utf-8'
-python -B -m swpurag import
 python -B -m swpurag search "计算机与软件学院全日制085404初试考什么？" --scoped
 python -B -m swpurag ask "石油与天然气工程学院非全日制085706的03油气储运工程方向初试考什么？"
 python -B -m swpurag ask "2026年12月18日成都二期图书馆晚上几点关门？"
@@ -36,7 +37,7 @@ python -B -m swpurag ask "计算机与软件学院全日制085404初试第四门
 
 ## 本地浏览器演示
 
-在项目目录激活 `SWPU_RAG`，按上方方式为当前终端配置模型。如果本地样本库还未建立，先运行 `python -B -m swpurag import`。
+在项目目录激活 `SWPU_RAG`，按上方方式为当前终端配置模型。如果尚无默认库，先执行下方两条离线重建命令。
 
 ```powershell
 Set-Location 'P:\SWPURAG'
@@ -60,6 +61,8 @@ python -B -m swpurag serve --port 8765
 
 15 篇独立验证库的分段适用范围、个人审核答复和前后对照见 [扩库验收报告](reports/expansion-acceptance.md)。
 
+默认库切换、回滚及三类浏览器实测见 [默认库更新记录](reports/default-corpus-promotion.md)。
+
 ## 工作区
 
 | 位置 | 用途 |
@@ -68,8 +71,9 @@ python -B -m swpurag serve --port 8765
 | `swpurag/web/` | 本地问答页面、引文和来源展示 |
 | `samples/pages.json` | 十三个明确的 URL、正文校验，以及招生、图书馆适用信息 |
 | `samples/captures.json` | 实际抓取记录，包括 URL、HTTP 状态、抓取时间、原件相对路径和 SHA-256 |
+| `samples/discovery/` | 两份四川网报资料的入库清单和抓取收据，以及栏目候选和验收题 |
 | `data/raw/` | 官网响应的原始 HTML 和 PDF 字节。按 SHA-256 命名，Git 保留字节级换行 |
-| `data/corpus.sqlite3` | 已导入的本地样本库，可从原件重建 |
+| `data/corpus.sqlite3` | 本地默认库，可从原件离线重建 |
 | `tests/` | 公开样本、合成版本变更、异常正文和引用边界验证 |
 | `reports/` | 来源清单、抓取命令与结果、检索和测试记录 |
 
@@ -100,19 +104,32 @@ python -B -m swpurag serve --port 8765
 
 ## 运行方式
 
-在已激活 `SWPU_RAG` 的终端执行。
+在已激活 `SWPU_RAG` 的终端进入项目目录。首次从空库重建时，依次导入 13 份基础原件与两份四川网报归档。`import` 从随项目保留的原件读取数据。已有默认库可直接查询。离线重建会按本次执行记录导入历史，切换时保留的历史见默认库更新记录。
 
 ```powershell
 Set-Location 'P:\SWPURAG'
 $env:PYTHONIOENCODING = 'utf-8'
-python -B -m swpurag import
+python -B -m swpurag import --manifest samples/pages.json --captures samples/captures.json
+python -B -m swpurag import --manifest samples/discovery/pages.json --captures samples/discovery/captures.json
+```
+
+```powershell
 python -B -m swpurag stats
 python -B -m swpurag search "成都 南充 校区" --limit 1
 python -B -m swpurag search "集中征集期" --limit 1 --json
 python -B -m unittest discover -s tests -v
 ```
 
-`import` 默认离线读取随项目保留的原件。`search` 接受空格或标点分隔的关键词，每个词需出现在标题或同一正文块中，且至少一个词命中正文。`--json` 返回完整正文块和元数据。默认数据库为 `data/corpus.sqlite3`。可在子命令前传入 `--db <路径>` 来单独重建或检查另一份库。
+`search` 接受空格或标点分隔的关键词，每个词需出现在标题或同一正文块中，且至少一个词命中正文。`--json` 返回完整正文块和元数据。默认数据库为 `data/corpus.sqlite3`。可在子命令前传入 `--db <路径>` 来单独重建或检查另一份库。
+
+复跑 13 篇、747 个正文块的旧实验时，在独立路径创建基础库。随后为 `ask`、`serve` 及评测模块显式指定这个旧库。下面是词法回归示例，向量对照的依赖和索引命令见旧实验报告。[首轮混合检索对照](reports/hybrid-retrieval.md)
+
+```powershell
+$old = 'data/local/corpus-13-replay.sqlite3'
+New-Item -ItemType Directory -Force reports/local | Out-Null
+python -B -m swpurag --db $old import --manifest samples/pages.json --captures samples/captures.json
+python -B -m swpurag.routing_eval --boundary --db $old --output reports/local/corpus-13-regression.jsonl
+```
 
 如需重新抓取已明确列入清单的单页，可执行 `python -B -m swpurag fetch --sample overview`。每个显式 URL 发起一次请求，批量时相邻请求至少间隔一秒。重定向、访问错误、验证页或正文异常作为失败记录。采集范围、实测结果及原始抓取命令见[来源清单与样本](reports/sources.md)。
 

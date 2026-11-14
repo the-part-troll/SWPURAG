@@ -4,21 +4,24 @@
 
 ## 启动、关闭与对照
 
-在已配置模型环境变量的终端启动。尚无样本库时先执行 `python -B -m swpurag import`。
+在已配置模型环境变量的终端启动。本报告复跑显式选择当时默认的 13 篇语料。
 
 ```powershell
 Set-Location 'P:\SWPURAG'
 conda activate SWPU_RAG
 $env:PYTHONIOENCODING = 'utf-8'
-python -B -m swpurag serve --port 8765
+$old = 'data/local/corpus-13-replay.sqlite3'
+if (-not (Test-Path -LiteralPath $old)) { python -B -m swpurag --db $old import }
+python -B -m swpurag --db $old serve --port 8765
 ```
 
 在浏览器访问 `http://127.0.0.1:8765/`。按启动终端的 `Ctrl+C` 停止。若 `conda` 启动器不可用，可使用 `C:\Users\libai\anaconda3\envs\SWPU_RAG\python.exe` 执行相同命令。模型配置沿用 `ask`；生成时问题和检索到的公开证据发送给配置的模型服务。
 
-在另一终端用同一个环境和模型逐题运行：
+在另一终端用同一个环境和模型逐题运行。
 
 ```powershell
-python -B -m swpurag ask --retriever scoped --limit 5 --json '<表中的原问句>'
+$old = 'data/local/corpus-13-replay.sqlite3'
+python -B -m swpurag --db $old ask --retriever scoped --limit 5 --json '<表中的原问句>'
 python -B -m unittest discover -s tests -v
 ```
 
@@ -53,7 +56,7 @@ from swpurag.answer import AnswerError
 from swpurag.server import serve
 
 with patch("swpurag.answer.request_model", side_effect=AnswerError("simulated provider failure")):
-    serve(Path("data/corpus.sqlite3"), Path("data"), 8766)
+    serve(Path("data/local/corpus-13-replay.sqlite3"), Path("data"), 8766)
 '@ | python -B -
 ```
 

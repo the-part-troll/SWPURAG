@@ -28,10 +28,11 @@ if (-not (Test-Path (Join-Path $model 'model.safetensors'))) {
   python -B -c "from huggingface_hub import snapshot_download; import sys; snapshot_download('shibing624/text2vec-base-chinese', revision='183bb99aa7af74355fb58d16edf8c13ae7c5433e', local_dir=sys.argv[1], allow_patterns=['model.safetensors', '*.json', 'vocab.txt'])" $model
 }
 $env:HF_HUB_OFFLINE = '1'
-# 无现成 SQLite 时，从随库公开原件重建。
-python -B -m swpurag import
-python -B -m swpurag.hybrid_eval build --model-dir $model --index data/local/hybrid-text2vec-r1.npz
-python -B -m swpurag.hybrid_eval evaluate --model-dir $model --index data/local/hybrid-text2vec-r1.npz --output reports/hybrid-retrieval-repeat.jsonl
+# 本轮历史实验的语料为 13 篇。需要重建时只导入基础原件。
+$old = 'data/local/corpus-13-replay.sqlite3'
+if (-not (Test-Path -LiteralPath $old)) { python -B -m swpurag --db $old import }
+python -B -m swpurag.hybrid_eval build --db $old --model-dir $model --index data/local/hybrid-text2vec-r1.npz
+python -B -m swpurag.hybrid_eval evaluate --db $old --model-dir $model --index data/local/hybrid-text2vec-r1.npz --output reports/hybrid-retrieval-repeat.jsonl
 ```
 
 已有库与索引时可跳过对应重建。索引与结果文件采用独占创建，重跑时用新文件名。依赖和索引位于已忽略的 `data/local/`。本次运行的权重 SHA-256 为 `0c855515479137398ce4ea985628548d4e8ed8c5764656dac966d6a24f39e721`，索引语料签名为 `0a2e8d0d44175acad0fa0940e15d9c1ded0cdfa2cd8ca19abc7c7de8e564dcb8`。原有 31 项离线测试通过；32 道旧题的默认词法完整结果与修改前逐项一致。逐题排名共使用 131 个不同正文块，全部按归档哈希重新解析核对成功。

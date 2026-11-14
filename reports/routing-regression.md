@@ -50,14 +50,16 @@ H 题中 15 道有完整答案所需证据。Top 5 任一组命中从 14/15 到 
 
 ## 复现命令
 
-在同一资料库中运行。若需要重放修复前结果，`--baseline-source` 指向修改前保留的三份可信源码 `topics.py`、`library_scope.py`、`answer.py`，评测在内存加载它们。当前工作区的副本在 `data/local/routing-baseline/`，修复前输出已归档。输出采用独占创建，复跑使用新文件名。
+使用当时默认的 13 篇语料。复跑显式选择独立基础库。若需要重放修复前结果，`--baseline-source` 指向修改前保留的三份可信源码 `topics.py`、`library_scope.py`、`answer.py`，评测在内存加载它们。当前工作区的副本在 `data/local/routing-baseline/`，修复前输出已归档。输出采用独占创建，复跑使用新文件名。
 
 ```powershell
 Set-Location 'P:\SWPURAG'
 conda activate SWPU_RAG
 $env:PYTHONIOENCODING = 'utf-8'
-python -B -m swpurag.routing_eval --baseline-source data/local/routing-baseline --output reports/routing-before-repeat.jsonl
-python -B -m swpurag.routing_eval --output reports/routing-after-repeat.jsonl
+$old = 'data/local/corpus-13-replay.sqlite3'
+if (-not (Test-Path -LiteralPath $old)) { python -B -m swpurag --db $old import }
+python -B -m swpurag.routing_eval --db $old --baseline-source data/local/routing-baseline --output reports/routing-before-repeat.jsonl
+python -B -m swpurag.routing_eval --db $old --output reports/routing-after-repeat.jsonl
 python -B -m unittest discover -s tests -v
 ```
 
@@ -68,7 +70,7 @@ $frozen = Get-Content -Raw -Encoding UTF8 samples/hybrid-library-mixed.json | Co
 New-Item -ItemType Directory -Force reports/local | Out-Null
 foreach ($id in 'H19', 'H20', 'H21') {
   $question = ($frozen | Where-Object id -eq $id).question
-  python -B -m swpurag ask $question --json | Out-File -NoClobber -Encoding utf8 "reports/local/routing-$id-repeat.json"
+  python -B -m swpurag --db $old ask $question --json | Out-File -NoClobber -Encoding utf8 "reports/local/routing-$id-repeat.json"
 }
 ```
 

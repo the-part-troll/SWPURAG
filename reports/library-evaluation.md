@@ -2,7 +2,7 @@
 
 2026-11-13 完成接入。两类问题共用 `ask`。图书馆覆盖成都一期总馆、二期分馆的常规开放、借阅续借及两份指定日期的临时公告。招生继续使用原年度、学院、学习方式和专业条件。混合问题分别取证和生成，在同一个 Top 5 内交替分配证据，子答复只可引用自己主题的原件。之前已有的招生条款标题等无排名上下文仍按原规则补充。
 
-五份公开 HTML 通过 SHA-256 校验并导入，增加 99 个正文块。正式库和从原件重建的隔离库均有 13 篇文档、13 个版本、747 个正文块。已验证八份原有材料重放均为原版本。[图书馆来源、原件及适用日期](library-sources.md) · [导入清单](../samples/pages.json) · [抓取清单](../samples/captures.json)
+五份公开 HTML 通过 SHA-256 校验并导入，增加 99 个正文块。当时的默认库和从原件重建的隔离库均有 13 篇文档、13 个版本、747 个正文块。已验证八份原有材料重放均为原版本。[图书馆来源、原件及适用日期](library-sources.md) · [导入清单](../samples/pages.json) · [抓取清单](../samples/captures.json)
 
 ## 范围与判定
 
@@ -18,15 +18,15 @@
 Set-Location 'P:\SWPURAG'
 $env:PYTHONIOENCODING = 'utf-8'
 conda activate SWPU_RAG
-python -B -m swpurag --db data/library-rebuild-check.sqlite3 import
-python -B -m swpurag import
-python -B -m swpurag stats
+$old = 'data/local/corpus-13-replay.sqlite3'
+if (-not (Test-Path -LiteralPath $old)) { python -B -m swpurag --db $old import }
+python -B -m swpurag --db $old stats
 python -B -m unittest discover -s tests -v
-python -B -m swpurag ask '2026年12月18日成都二期图书馆晚上几点关门？'
-python -B -m swpurag.evaluate --generate --method scoped --questions samples/library-eval.json --output reports/library-evaluation-final.jsonl
-python -B -m swpurag.evaluate --generate --method scoped --questions samples/admissions-catalog-scope-eval.json --only F3 --only F4 --only F7 --output reports/library-regression-f.jsonl
-python -B -m swpurag.evaluate --generate --method scoped --only Q2 --output reports/library-regression-q.jsonl
-python -B -m swpurag.evaluate --generate --method scoped --questions samples/admissions-acceptance.json --only A5 --output reports/library-regression-a.jsonl
+python -B -m swpurag --db $old ask '2026年12月18日成都二期图书馆晚上几点关门？'
+python -B -m swpurag.evaluate --db $old --generate --method scoped --questions samples/library-eval.json --output reports/library-evaluation-repeat.jsonl
+python -B -m swpurag.evaluate --db $old --generate --method scoped --questions samples/admissions-catalog-scope-eval.json --only F3 --only F4 --only F7 --output reports/library-regression-f-repeat.jsonl
+python -B -m swpurag.evaluate --db $old --generate --method scoped --only Q2 --output reports/library-regression-q-repeat.jsonl
+python -B -m swpurag.evaluate --db $old --generate --method scoped --questions samples/admissions-acceptance.json --only A5 --output reports/library-regression-a-repeat.jsonl
 ```
 
 ## 冻结新题
