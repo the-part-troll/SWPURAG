@@ -1,0 +1,110 @@
+[
+  {
+    "id": "B01",
+    "question": "我考的是别的学校，想在西油本部5110考。我们有一门初试得自己用画板，这个考点收不收？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "5110 不接收招生单位要求使用画板类的考生，应选所报单位的报考点；误选不予网上确认", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 27}]}
+    ],
+    "wrong_scope": [{"sample": "masters-admissions-unit-10615-2027"}]
+  },
+  {
+    "id": "B02",
+    "question": "我准备报西南石油大学的非全日制硕士，网报的报考类别是不是得选定向就业？我户口在外省但在四川上班，要是选本部5110，还得传哪些工作材料？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "报考该校非全日制的考生选定向就业并填写定向就业单位等信息", "alternatives": [{"sample": "masters-admissions-unit-10615-2027", "paragraph": 22}]},
+      {"label": "5110 对在四川工作、外省户口的考生要求单位在职工作证明和近三个月社保缴费清单", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 13}, {"sample": "masters-exam-site-5110-2027", "paragraph": 25}]}
+    ],
+    "wrong_scope": [],
+    "notes": "同一人明确同时报考该校并考虑选择本部考点，各段只用于相应问题；这里只问工作材料，不能据此判定已满足全部报考条件。"
+  },
+  {
+    "id": "B03",
+    "question": "西油5110的考研报名费交过了，我个人改主意想把报名撤掉，最晚几点前在网上操作还能退报名费？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "个人原因放弃报考须在 2026 年 10 月 24 日 22:00 前登录网报系统取消已缴费报名，由系统统一退费", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 43}]}
+    ],
+    "wrong_scope": [],
+    "notes": "第 44 段的对象是确认后未参加考试者，不用于回答取消报名的退费期限。"
+  },
+  {
+    "id": "B04",
+    "question": "我报的西油本部5110，网上确认都弄完了，考试那天要是不去，缴的考试费还有得退不？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "完成网报信息确认但没有参加考试，已支付报名考试费不予退还", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 44}]}
+    ],
+    "wrong_scope": [],
+    "notes": "第 43 段的取消报名期限不能解释为确认后缺考仍能退费。"
+  },
+  {
+    "id": "B05",
+    "question": "想问西油本部5110两种退报名费的情况：报名交钱后自己撤单，有没有最后时限？如果已经网上确认、后来人没去考试，考试费还能回来吗？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "主动取消已付费报名须在 2026 年 10 月 24 日 22:00 前操作，统一退费", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 43}]},
+      {"label": "网报信息确认后未参考，已付报名考试费不退", "alternatives": [{"sample": "masters-exam-site-5110-2027", "paragraph": 44}]}
+    ],
+    "wrong_scope": [],
+    "notes": "分别陈述撤单截止时间与确认后未参考不退费，不能共用结论。"
+  },
+  {
+    "id": "B06",
+    "question": "成都总馆有本书原定2026年7月10日到期，7月11日仍没还，打算9月6日还。按暑期公告，之前的超期天数会不会扣掉？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "7 月 11 日（含当日）之前已到期且未归还的图书，超期天数自动连续计算、不予扣除；7 月 10 日到期不因 9 月 6 日计划归还而变成公告的免超期对象", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 12}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7}
+    ],
+    "notes": "7 月 11 日是未归还时的参照日期，不是另一个原到期日或计划归还日。无需推断罚金。"
+  },
+  {
+    "id": "B07",
+    "question": "我从成都二期图书馆借的书原本2026年7月11日到期，打算9月6日归还。按那份暑期通知，这本书算不算超期？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "insufficient",
+    "required": [
+      {"label": "同段前句将 7 月 11 日纳入延期范围，后句同样写 7 月 11 日（含当日）且限定已到期未归还的图书，个案应引用两句、说明无法据此定性并建议向图书馆核对", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 12}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7}
+    ],
+    "notes": "第 12 段应进入候选池并进入 Top 5；这是有原文但适用条款重叠的答案缺口。不得自行判定超期或免超期。"
+  },
+  {
+    "id": "B08",
+    "question": "成都分馆的书本来2026年7月12日到期，计划9月6日还，按暑期公告当天归还算超期吗？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "7 月 12 日落在延期适用区间，9 月 6 日含当天归还视为不超期", "alternatives": [{"sample": "library-chengdu-2026-summer-schedule", "paragraph": 12}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 5},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 6},
+      {"sample": "library-chengdu-2026-summer-schedule", "paragraph": 7}
+    ]
+  }
+]

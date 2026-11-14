@@ -54,6 +54,8 @@ python -B -m swpurag serve --port 8765
 
 常规开放、口语招生问句、续借和延期归还的修复结果见 [主题路由与证据筛选复审](reports/routing-regression.md)。
 
+5110 考点的来源范围、退费取证和暑期归还边界见 [规则边界复审](reports/boundary-regression.md)。
+
 ## 工作区
 
 | 位置 | 用途 |

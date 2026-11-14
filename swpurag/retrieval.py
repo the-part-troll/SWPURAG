@@ -16,6 +16,22 @@ _QUESTION_CLAUSE = re.compile(
     r"多久|多长时间|多少|几(?:个|年|月|天|日)|哪些|哪[里儿]|什么|"
     r"怎么|怎样|如何|何时|是否|能否|可否|能不能|要不要|是不是|吗$"
 )
+_EXAM_SITE = re.compile(r"(?<!\d)5110(?!\d)|(?:西油|西南石油大学|我校|该校)(?:校)?本部(?:报考点|考点)")
+_REFUND_REQUEST = re.compile(
+    r"退(?:报名费|考试费|费|款|钱|不退)|(?:报名费|考试费|交的费|费用|考试的钱)[^。？；？！.!?;]{0,15}(?:退|回来)|"
+    r"(?:还|能|给|得|可)(?:不)?退"
+)
+_REFUND_SCENARIOS = (
+    ("cancel", re.compile(
+        r"(?:取消|撤掉|撤销|撤回)(?:(?:已|已经)(?:缴费|付款|支付)的)?(?:报名|网报)|"
+        r"(?:报名|网报)[^，。；！？,;.!?]{0,8}(?:取消|撤掉|撤销|撤回)|撤单"
+    )),
+    ("absent", re.compile(
+        r"缺考|(?:未|没|没有|不)(?:去(?:参加)?|参加)考试|放弃参加考试|"
+        r"考试(?:那天|当天)?[^，。；！？,;.!?]{0,6}(?:不去|没去)|没去考|不去考"
+    )),
+)
+_REFUND_SENTENCE = re.compile(r"[。；？！.!?;]+")
 _DURATION_BOUND = re.compile(
     r"(?:要|须|需)?(至少|最少|超过|达到|满|间隔|相隔|累计|等待|持续|保持)"
     r"(?=多(?:久|长时间)|几(?:个)?[年月天日])"
@@ -228,7 +244,7 @@ def rank_candidates(store, query, limit, admission_year=None, rows=None, *,
         ranked = search_natural(store, query, count, admission_year, candidates)
         if not fallback:
             return ranked
-        # 图书馆先锁定可用条款。问句改写没有词法匹配时仍保留该条款。
+        # 已限定适用条款的批次，即使口语问句没有词法命中也可回退到候选。
         result = {}
         for row in ranked + candidates:
             result.setdefault((row["version_id"], row["chunk_id"]), row)
@@ -262,9 +278,34 @@ def rank_candidates(store, query, limit, admission_year=None, rows=None, *,
 
 def explicit_subquestions(query):
     """Conservatively select separate clauses with their own question marker."""
+    if len(exam_site_refund_scenarios(query)) == 2:
+        # “确认后缺考，还退吗”里的逗号分隔的是条件和问题，不能只保留“还退吗”。
+        parts = []
+        found = set()
+        for clause in _REFUND_SENTENCE.split(query):
+            kinds = [kind for kind, pattern in _REFUND_SCENARIOS if pattern.search(_search_text(clause))]
+            if len(kinds) == 1:
+                parts.append(clause.strip())
+                found.update(kinds)
+            elif not kinds:
+                parts.extend(piece.strip() for piece in _CLAUSE_BREAK.split(clause)
+                             if _QUESTION_CLAUSE.search(piece.strip()))
+        if len(found) == 2 and len(parts) <= 5:
+            return list(dict.fromkeys(parts))
     clauses = (clause.strip() for clause in _CLAUSE_BREAK.split(query))
     questions = list(dict.fromkeys(clause for clause in clauses if _QUESTION_CLAUSE.search(clause)))
     return questions if 2 <= len(questions) <= 5 else []
+
+
+def exam_site_refund_scenarios(question):
+    query = _search_text(question)
+    if not (mentions_exam_site(query) and _REFUND_REQUEST.search(query)):
+        return ()
+    return tuple(kind for kind, pattern in _REFUND_SCENARIOS if pattern.search(query))
+
+
+def mentions_exam_site(question):
+    return bool(_EXAM_SITE.search(question))
 
 
 def search_admission_question(store, query, limit, admission_year, rows=None, reserved=(), *,

@@ -50,8 +50,20 @@ _PLAN_AFTER = re.compile(
     r"^\s*(?:那天|当天|以后|下午|上午|晚上)?\s*(?:再|才|就|去|来|能|可以)*(?:成都[总分]馆|(?:成都)?[一二]期(?:图书馆)?)?"
     r"\s*(?:归还|还(?:书|给|这本|那本|$|(?=[，。？；,.?;\s]|算|会|行|就|可以)))"
 )
+_UNRETURNED_AFTER = re.compile(
+    r"^\s*(?:当天|当日|这天)?\s*(?:仍(?:然)?|一直|还|尚)?\s*(?:未(?:曾)?|没(?:有)?)\s*"
+    r"(?:归还|还书|还(?:这本|那本|它|$))"
+)
 _RETURN_LIMIT = re.compile(
     r"在\s*(?:(\d{4})\s*年\s*)?(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]\s*\(含(?:当)?日\)\s*(?:之?前)?\s*(?:归还|还书)"
+)
+_WAIVER_START = re.compile(
+    r"还书日期在\s*(?:(\d{4})\s*年\s*)?(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]"
+    r"(?:起|至)\s*[^。]*?\(均含(?:当)?日\)[^。]*?视为不超期"
+)
+_CARRYOVER_LIMIT = re.compile(
+    r"在\s*(?:(\d{4})\s*年\s*)?(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]"
+    r"\s*\(含(?:当)?日\)\s*(?:之?前)已经到期的未归还图书[^。]*?超期天数[^。]*?连续计算[^。]*?不会给予扣除"
 )
 _READER = {
     "graduate": r"研究生|硕士生|博士生",
@@ -88,6 +100,8 @@ def _return_date_role(before, after):
     # 「原定某日归还」的原定修饰日期，即使日期后也是还书动作。
     if _DUE_BEFORE.search(before) or _DUE_AFTER.search(after):
         return "due_date"
+    if _UNRETURNED_AFTER.search(after):
+        return "unreturned_on"
     if _PLAN_BEFORE.search(before) or _PLAN_AFTER.search(after):
         return "return_date"
     return None
@@ -128,7 +142,8 @@ def _loan_dates(question, today):
             return {}, "请提供有效的还书日期。"
         normalized = day.isoformat()
         if role in dates and dates[role] != normalized:
-            label = "原到期日" if role == "due_date" else "计划归还日"
+            label = {"due_date": "原到期日", "return_date": "计划归还日",
+                     "unreturned_on": "仍未归还的日期"}[role]
             return {}, "请确认这本书的一个具体{}。".format(label)
         dates[role] = normalized
         dates[role + "_source"] = source
@@ -143,16 +158,37 @@ def _loan_dates(question, today):
     return dates, None
 
 
-def _extension_deadline(row):
-    # 免超期的截止时间来自公告正文，和适用范围的结束时间分别核对。
-    match = _RETURN_LIMIT.search(_search_text(row["text"]))
+def _notice_date(match, scope, field):
     if not match:
         return None
-    year = match[1] or _scope(row)["effective_to"][:4]
+    year = match[1] or (scope.get(field) or "")[:4]
     try:
         return date(int(year), int(match[2]), int(match[3])).isoformat()
     except ValueError:
         return None
+
+
+def _return_policy(row, row_scope, dates):
+    # 用同一段原文分别识别免超期起点和超期连续计算截止，不合并两个适用条件。
+    due = dates["due_date"]
+    waiver = carryover = None
+    for sentence in re.split(r"(?<=。)", row["text"]):
+        normalized = _search_text(sentence)
+        waived_from = _notice_date(_WAIVER_START.search(normalized), row_scope, "effective_from")
+        carryover_through = _notice_date(_CARRYOVER_LIMIT.search(normalized), row_scope, "effective_from")
+        if waived_from == due:
+            waiver = sentence.strip()
+        if carryover_through:
+            carryover = (carryover_through, sentence.strip())
+    if not carryover:
+        return None
+    through, quote = carryover
+    if waiver and due == through and _active(row_scope, due):
+        return {"kind": "overlap", "chunk_id": row["chunk_id"], "quotes": [waiver, quote]}
+    observed = dates.get("unreturned_on")
+    if observed and due < through <= observed and _active(row_scope, observed):
+        return {"kind": "carryover", "chunk_id": row["chunk_id"], "quotes": [quote]}
+    return None
 
 
 def _scope(row):
@@ -288,17 +324,26 @@ def search_library(store, question, limit=5, today=None, *, ranker=None, trace=N
                 scope["clarification"] = "请问读者属于哪一类，例如本科生、研究生或校外读者？"
                 continue
             service_day = day
+            return_policies = {}
             if aspect == "holiday_return":
                 loan_dates, clarification = _loan_dates(question, today)
                 scope["loan_dates"] = loan_dates
                 service_day = loan_dates.get("due_date")
                 if not hours:
                     scope.update(date=service_day, date_source=loan_dates.get("due_date_source"))
-                if clarification:
+                if service_day:
+                    for row, sc in applicable:
+                        if sc["notice_kind"] == "temporary":
+                            return_policy = _return_policy(row, sc, loan_dates)
+                            if return_policy:
+                                return_policies[row["chunk_id"]] = return_policy
+                # 明确的原到期日已落在公告重叠边界时，补归还日也无法消除原文歧义。
+                overlap = any(policy["kind"] == "overlap" for policy in return_policies.values())
+                if clarification and not overlap:
                     scope["clarification"] = clarification
                     continue
             temporary = [row for row, sc in applicable if sc["notice_kind"] == "temporary"
-                         and _active(sc, service_day)]
+                         and (_active(sc, service_day) or row["chunk_id"] in return_policies)]
             policy = [row for row, sc in applicable if sc["notice_kind"] == "policy"
                       and sc.get("reader_group") in (None, scope["reader_group"])]
             # 生效的临时安排仅覆盖当前借阅事项，其他事项仍各自查找规则。
@@ -311,10 +356,16 @@ def search_library(store, question, limit=5, today=None, *, ranker=None, trace=N
                                          trace=trace, topic="library", stage="loan:" + aspect, fallback=True)
                 groups.append(ranked)
                 if aspect == "holiday_return" and temporary and ranked:
-                    deadline = _extension_deadline(ranked[0])
+                    selected_row = ranked[0]
+                    return_policy = return_policies.get(selected_row["chunk_id"])
+                    # 公告中的归还截止，与借阅规则本身是否适用分别判断。
+                    deadline = _notice_date(_RETURN_LIMIT.search(_search_text(selected_row["text"])),
+                                            _scope(selected_row), "effective_to")
                     planned = loan_dates.get("return_date")
                     loan_dates.update(extension_until=deadline,
-                                      within_extension=planned <= deadline if planned and deadline else None)
+                                      within_extension=planned <= deadline if planned and deadline and not return_policy else None)
+                    if return_policy:
+                        scope["return_policy"] = return_policy
             else:
                 gaps.append("现有资料没有适用于所问读者、馆舍或日期的借阅证据。")
         scope["campus"] = scope["campus"] or _CHENGDU

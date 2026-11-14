@@ -65,6 +65,9 @@ library_scope 元数据中，发布日期不等于适用日期。临时开放只
 同时问次数和操作时，各自引用读者规则和操作指南。有 loan_dates 时，以原到期日核对延期的
 适用区间，以计划归还日核对公告中的截止日期。写明所问日期是否落在免超期时段，引用公告，
 不要从超出公告时段推断罚金或其他未给出的处理规则。
+return_policy.kind 为 carryover 时，原到期日在边界之前且指定日仍未归还。回答超期天数
+如何计算时，只引用对应证据中有关已到期未归还的一整句，提供一个 citation。
+免超期截止日不能作为本个案的延期依据。
 引文只抄 evidence.text 内的原文，不把 metadata 拼进引文。"""
 
 
@@ -323,6 +326,25 @@ def synthesize(question, evidence, system_prompt=SYSTEM_PROMPT, subquestions=(),
     return result
 
 
+def library_return_policy(policy, evidence):
+    # 只在本轮原文支持时解释已匹配的条款。重叠条款保留两处完整引文。
+    original = next((row for row in evidence if row["chunk_id"] == policy["chunk_id"]), None)
+    if original is None:
+        answer = {"status": "insufficient", "claims": [],
+                  "follow_up": "本轮证据未提供可核对的延期条款，无法确认是否超期。请向图书馆核对。"}
+    elif policy["kind"] == "overlap":
+        answer = {"status": "insufficient",
+                  "claims": [{"text": quote, "citations": [{"id": original["id"], "quote": quote}]}
+                             for quote in policy["quotes"]],
+                  "follow_up": "公告两处范围在原到期日重叠，无法仅凭公告确认这本书是否超期。请向图书馆核对。"}
+    else:
+        answer = {"status": "answered", "follow_up": "", "claims": [{
+            "text": "按这份公告，这本书在通知所列日期前已到期，到了该日还没归还。超期天数会连续计算，已经产生的超期天数不会扣除。",
+            "citations": [{"id": original["id"], "quote": policy["quotes"][0]}],
+        }]}
+    return dict(validate_answer(answer, evidence), answer_origin="scope_check")
+
+
 def answer_question(store, question, method="natural", limit=5):
     question = question.strip()
     evidence, questions, scopes = prepare_retrieval(store, question, method, limit)
@@ -340,13 +362,18 @@ def answer_question(store, question, method="natural", limit=5):
             result = {"status": "insufficient", "claims": [], "follow_up": gaps,
                       "answer_origin": "scope_check"}
         elif topic == "library":
-            prompt = SYSTEM_PROMPT.replace("2027 年普通硕士招生", "成都校区图书馆服务", 1)
-            if scope.get("no_applicable_extension"):
-                prompt += ("\n问题问延时是否适用，而检索仅找到常规开放。先直接说明归档的延时安排"
-                           "没有覆盖查询日期。只引用常规时段，不推断是否另有未收录的通知。")
-            result = synthesize(text, relevant, prompt + LIBRARY_PROMPT, query_scope=scope)
-            if gaps and result["status"] == "answered":
-                result.update(status="insufficient", follow_up=gaps)
+            return_policy = scope.get("return_policy", {})
+            rule = return_policy.get("kind")
+            if rule == "overlap" or (rule == "carryover" and len(relevant) == 1 and not gaps):
+                result = library_return_policy(return_policy, relevant)
+            else:
+                prompt = SYSTEM_PROMPT.replace("2027 年普通硕士招生", "成都校区图书馆服务", 1)
+                if scope.get("no_applicable_extension"):
+                    prompt += ("\n问题问延时是否适用，而检索仅找到常规开放。先直接说明归档的延时安排"
+                               "没有覆盖查询日期。只引用常规时段，不推断是否另有未收录的通知。")
+                result = synthesize(text, relevant, prompt + LIBRARY_PROMPT, query_scope=scope)
+                if gaps and result["status"] == "answered":
+                    result.update(status="insufficient", follow_up=gaps)
         else:
             result = synthesize(text, relevant, subquestions=explicit_subquestions(text))
         parts[topic] = result

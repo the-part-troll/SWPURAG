@@ -53,6 +53,36 @@ class LibraryReturnDatesTest(unittest.TestCase):
         self.assertIn("原到期日", scope["unsupported"][0])
         self.assertEqual(scope["loan_dates"]["return_date"], "2026-09-06")
 
+    def test_overlapping_cutoff_retains_both_original_sentences(self):
+        prefix = "成都分馆的书原本2026年7月11日到期，"
+        for question in (
+            prefix + "打算9月6日归还，按暑期通知算不算超期？",
+            prefix + "按暑期通知会不会超期？",
+        ):
+            with self.subTest(question=question):
+                hits, scope = self.search(question)
+                self.assertEqual([hit["locator"]["paragraph"] for hit in hits], [12])
+                self.assertFalse(scope["clarification"])
+                self.assertIsNone(scope["loan_dates"]["within_extension"])
+                policy = scope["return_policy"]
+                self.assertEqual(policy["kind"], "overlap")
+                self.assertEqual(policy["chunk_id"], hits[0]["chunk_id"])
+                waived, carryover = policy["quotes"]
+                self.assertIn("（均含当日）", waived)
+                self.assertIn("7月11日（含当日）之前已经到期的未归还图书", carryover)
+                self.assertEqual(waived + carryover, hits[0]["text"])
+
+    def test_earlier_due_date_with_explicit_unreturned_status_uses_carryover(self):
+        hits, scope = self.search(
+            "成都总馆有本书原定2026年7月10日到期，7月11日仍没还，打算9月6日还。按暑期公告，之前的超期天数会不会扣掉？"
+        )
+        self.assertEqual([hit["locator"]["paragraph"] for hit in hits], [12])
+        self.assertFalse(scope["clarification"])
+        self.assertEqual(scope["loan_dates"]["unreturned_on"], "2026-07-11")
+        self.assertIsNone(scope["loan_dates"]["within_extension"])
+        self.assertEqual(scope["return_policy"]["kind"], "carryover")
+        self.assertIn("不会给予扣除", scope["return_policy"]["quotes"][0])
+
     def test_conflicting_or_missing_roles_are_clarified(self):
         cases = [
             ("成都总馆的书可能是2026年7月10日到期，也可能是7月12日到期，打算9月6日还，算暑期延期吗？", "原到期日"),

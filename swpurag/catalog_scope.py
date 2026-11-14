@@ -2,7 +2,10 @@
 
 import re
 
-from .retrieval import explicit_subquestions, rank_candidates, search_admission_question
+from .retrieval import (
+    exam_site_refund_scenarios, explicit_subquestions, mentions_exam_site, rank_candidates,
+    search_admission_question,
+)
 from .store import _search_text
 
 
@@ -14,6 +17,20 @@ _BOTH_MODES = re.compile(r"两份目录|两种学习方式|全日制(?:和|与|�
 _CODE = re.compile(r"(?<![a-z0-9])\d{4}[a-z0-9]{2}(?![a-z0-9])")
 _POLICY = re.compile(r"章程|报考条件|报考资格|工作经验|学费|收费标准|同等学力报考")
 _SPECIAL_EXAM = re.compile(r"(?:报考|报|参加|走)(?:我校|学校|该校)?(?:单独考试|单考|退役大学生士兵专项)")
+_AFFIRMATIVE = r"(?<!不)(?<!没)(?<!不是)"
+_APPLY = r"(?:报考|报名|(?<!报)考|报|申请)(?:的是|是|的|了)?"
+_OTHER_SCHOOL = r"外校|(?:其他|别的|另一所|别所)(?:高校|学校|大学|院校)"
+_OTHER_UNIT = re.compile(
+    rf"{_AFFIRMATIVE}(?:{_APPLY}|招生单位(?:是|为|选的是))(?:{_OTHER_SCHOOL})"
+)
+_OWN_UNIT = re.compile(
+    rf"{_AFFIRMATIVE}(?:{_APPLY}|招生单位(?:是|为|选的是))"
+    r"(?:西南石油大学|西油|本校|该校|10615(?!\d))(?!的?(?:校?本部|考点|报考点|5110))"
+)
+_REFUND_EVIDENCE = {
+    "cancel": re.compile(r"取消[^。]{0,18}报名[^。]{0,60}退费"),
+    "absent": re.compile(r"确认[^。]{0,14}未参加考试[^。]{0,24}(?:不予退还|不退费)"),
+}
 _DETAIL_FIELDS = {
     "subjects": re.compile(r"科目|初试|第[一二三四1234]门|考什么|考哪|专业课"),
     "direction": re.compile(r"方向|研究方向"),
@@ -97,10 +114,24 @@ def _pair_comparison(query, targets, colleges):
     return targets
 
 
+def _refund_rows(rows):
+    groups = {scenario: [] for scenario in _REFUND_EVIDENCE}
+    for row in rows:
+        if row.get("role") == "exam_site":
+            for scenario, pattern in _REFUND_EVIDENCE.items():
+                if pattern.search(_compact(row["text"])):
+                    groups[scenario].append(row)
+    return groups
+
+
 def search_scoped(store, question, limit, admission_year, *, ranker=None, trace=None):
     """Return ranked evidence and any missing scope that changes the answer."""
     query = _compact(question)
     rows = [row for row in store.current_chunks() if row.get("admission_year") == admission_year]
+    external_site = mentions_exam_site(query) and _OTHER_UNIT.search(query) and not _OWN_UNIT.search(query)
+    if external_site:
+        # 此处的招生单位公告、章程和目录均面向报考西南石油大学的考生。
+        rows = [row for row in rows if row.get("role") not in {"admission_unit", "admission_directory"}]
     directories = [row for row in rows if row.get("role") == "admission_directory"]
     directions = [row for row in directories if row["locator"].get("row_type") == "direction"]
     modes = tuple(dict.fromkeys(_MODE.findall(query)))
@@ -163,6 +194,16 @@ def search_scoped(store, question, limit, admission_year, *, ranker=None, trace=
 
     # 对比时为每侧预留证据。兼问政策时另留政策段落，避免都被目录条目占用。
     reserved = []
+    refunds = exam_site_refund_scenarios(question)
+    if refunds:
+        groups = _refund_rows(pool)
+        excluded = {row["chunk_id"] for kind, matches in groups.items() if kind not in refunds for row in matches}
+        pool = [row for row in pool if row["chunk_id"] not in excluded]
+        # 两种退费情形各自取证。即使问句用“撤单”或“没去考”，也保留可核对的正式条款。
+        for kind in refunds:
+            reserved.extend(rank_candidates(store, question, 1, admission_year, groups[kind],
+                                            ranker=ranker, trace=trace, stage="refund:" + kind,
+                                            fallback=True))
     if targets and catalog_lookup and not special_exam:
         if compare_modes:
             for mode in modes:

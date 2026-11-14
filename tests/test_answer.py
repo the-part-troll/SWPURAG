@@ -1,6 +1,7 @@
 """Check citation boundaries and fail-closed behavior without a model credential."""
 
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from swpurag.answer import AnswerError, answer_question, validate_answer, validate_parts
@@ -8,6 +9,21 @@ from swpurag.topics import topic_questions
 
 
 class AnswerTest(unittest.TestCase):
+    def test_ambiguous_return_policy_preserves_both_quotes_without_synthesis(self):
+        quotes = ["范围含当日的部分可以延期。", "含当日之前已经到期的未归还图书继续计算。"]
+        hit = {"chunk_id": 7, "id": 1, "evidence_topic": "library", "text": "".join(quotes)}
+        question = "成都总馆原到期日正好在边界的书算不算超期？"
+        scope = {"return_policy": {"kind": "overlap", "chunk_id": 7, "quotes": quotes}}
+        evidence = ([hit], {"library": question}, {"library": scope})
+        with patch("swpurag.answer.prepare_retrieval", return_value=evidence), \
+                patch("swpurag.answer.request_model") as model:
+            answer = answer_question(SimpleNamespace(), question, "scoped")
+        model.assert_not_called()
+        self.assertEqual(answer["status"], "insufficient")
+        self.assertIn("向图书馆核对", answer["follow_up"])
+        self.assertEqual([claim["citations"] for claim in answer["claims"]],
+                         [[{"id": 1, "quote": quote}] for quote in quotes])
+
     def test_mixed_subject_question_keeps_calendar_date_with_library(self):
         questions = topic_questions("想报2027年计软学院全日制085404，第四科考啥？"
                                     "另外2026年12月18日，成都总馆几点关门？")
