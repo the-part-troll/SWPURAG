@@ -1,0 +1,20 @@
+{
+  "H05": [
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 36},
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 37}
+  ],
+  "Q2": [
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 42},
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 43}
+  ],
+  "A4": [
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 36},
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 37},
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 40},
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 41}
+  ],
+  "A5": [
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 32},
+    {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 33}
+  ]
+}

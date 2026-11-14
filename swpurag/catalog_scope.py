@@ -2,10 +2,12 @@
 
 import re
 
+from .admission_paragraphs import applicable_admission_paragraphs
 from .retrieval import (
     exam_site_refund_scenarios, explicit_subquestions, mentions_exam_site, rank_candidates,
     search_admission_question,
 )
+from .review_scope import review_candidates, review_question
 from .store import _search_text
 
 
@@ -128,7 +130,9 @@ def search_scoped(store, question, limit, admission_year, *, ranker=None, trace=
     """Return ranked evidence and any missing scope that changes the answer."""
     query = _compact(question)
     rows = [row for row in store.current_chunks() if row.get("admission_year") == admission_year]
-    external_site = mentions_exam_site(query) and _OTHER_UNIT.search(query) and not _OWN_UNIT.search(query)
+    exam_site = mentions_exam_site(query)
+    own_unit = bool(_OWN_UNIT.search(query))
+    external_site = exam_site and _OTHER_UNIT.search(query) and not own_unit
     if external_site:
         # 此处的招生单位公告、章程和目录均面向报考西南石油大学的考生。
         rows = [row for row in rows if row.get("role") not in {"admission_unit", "admission_directory"}]
@@ -192,6 +196,7 @@ def search_scoped(store, question, limit, admission_year, *, ranker=None, trace=
                 continue
         pool.append(row)
 
+    pool, paragraph_groups = applicable_admission_paragraphs(pool, query, own_unit=own_unit, exam_site=exam_site)
     # 对比时为每侧预留证据。兼问政策时另留政策段落，避免都被目录条目占用。
     reserved = []
     refunds = exam_site_refund_scenarios(question)
@@ -224,6 +229,17 @@ def search_scoped(store, question, limit, admission_year, *, ranker=None, trace=
             policy_query = next((part for part in explicit_subquestions(question) if _POLICY.search(part)), question)
             reserved.extend(rank_candidates(store, policy_query, 1, admission_year, policy_rows,
                                             ranker=ranker, trace=trace, stage="reserved_policy"))
+
+    for purpose, group in paragraph_groups.items():
+        if group:
+            reserved.extend(rank_candidates(store, question, 1, admission_year, group, ranker=ranker,
+                                            trace=trace, stage="paragraph:" + purpose, fallback=True))
+    review = review_question(question)
+    if review:
+        for purpose, group in review_candidates(pool, review):
+            if group:
+                reserved.extend(rank_candidates(store, question, 1, admission_year, group, ranker=ranker,
+                                                trace=trace, stage="review:" + purpose, fallback=True))
 
     hits = search_admission_question(store, question, limit, admission_year, pool, reserved,
                                      ranker=ranker, trace=trace)

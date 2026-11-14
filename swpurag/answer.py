@@ -12,6 +12,7 @@ from .capture import NoRedirect
 from .catalog_scope import search_scoped
 from .library_scope import search_library, split_library_return_question
 from .retrieval import explicit_subquestions, search_admission_question
+from .review_scope import review_candidates, review_question, status_quote
 from .topics import interleave_hits, topic_questions
 
 
@@ -69,6 +70,19 @@ return_policy.kind 为 carryover 时，原到期日在边界之前且指定日�
 如何计算时，只引用对应证据中有关已到期未归还的一整句，提供一个 citation。
 免超期截止日不能作为本个案的延期依据。
 引文只抄 evidence.text 内的原文，不把 metadata 拼进引文。"""
+
+REVIEW_STATUS_QUESTION = "四川省2027年研考网上报名的审核结果显示待补充材料，这一公开状态是什么意思？"
+REVIEW_STATUS_PROMPT = """
+只解释“待补充材料”公开状态的含义以及该状态下应按谁的要求补交材料。用一条事实陈述并引用
+正文中解释这一状态的原文。只返回完整的公开规则，不要追问个人条件，不要要求个人报名信息。"""
+REVIEW_DEADLINES = {
+    "submit": "四川省2027年研考的考生按要求补交材料，公开截止时间是哪一天几点？",
+    "first_review": "四川省2027年研考网报材料的首轮审核，公开完成时限是哪一天几点？",
+    "both": "四川省2027年研考网报材料的首轮审核完成时限和考生补交材料截止时间分别是哪一天几点？",
+}
+REVIEW_DEADLINE_PROMPT = """
+只回答证据中的公开时限。辨明主体及事项，区分首轮审核完成、考生补交、审核安排结束；
+只有被问到的时限才作答。任何公共时限都不能推断个人审核通过的时间。"""
 
 
 def request_model(question, evidence, system_prompt, subquestions=(), query_scope=None):
@@ -388,6 +402,49 @@ def _library_overlap_answer(question, scope, evidence):
     }
 
 
+def _answer_personal_review(intent, evidence):
+    # 先固定个人数据缺口。只将公开规则子问及其适用原文发送给模型。
+    eligible = dict(review_candidates(evidence, intent))
+    status_evidence = eligible["status"]
+    gap = ("现有公开资料无法确认您本人缺哪份材料或何时通过审核。"
+           "请查看研招网本人报名页面的审核意见，或联系您所选的报考点。")
+    personal = {"status": "insufficient", "claims": [], "follow_up": gap, "answer_origin": "scope_check"}
+    if status_evidence:
+        result = synthesize(REVIEW_STATUS_QUESTION, status_evidence, SYSTEM_PROMPT + REVIEW_STATUS_PROMPT)
+        if result["status"] == "answered":
+            personal.update(claims=result["claims"], model=result["model"], answer_origin="model_and_scope_check")
+        else:
+            # 即使模型不可用，明文定义也能以校验过的摘录解释状态。
+            row = status_evidence[0]
+            personal["claims"] = [{"text": "待补充材料表示报名阶段材料缺失，应按报考点要求补交。",
+                                   "citations": [{"id": row["id"], "quote": status_quote(row)}]}]
+            validate_answer(personal, status_evidence)
+            personal["model_status"] = result["status"]
+            if result.get("error"):
+                personal["error"] = result["error"]
+    if not (intent["deadline"] or intent["remainder"]):
+        return personal
+
+    parts = [dict(personal, id=1, question="审核状态和个人进度")]
+    if intent["deadline"]:
+        deadline_question = REVIEW_DEADLINES[intent["deadline"]]
+        deadline_rows = eligible["deadline"]
+        deadline = (synthesize(deadline_question, deadline_rows, SYSTEM_PROMPT + REVIEW_DEADLINE_PROMPT)
+                    if deadline_rows else {"status": "insufficient", "claims": [],
+                                           "follow_up": "当前证据未提供所问的公开材料审核时限。"})
+        parts.append(dict(deadline, id=len(parts) + 1, question=deadline_question))
+    if intent["remainder"]:
+        remainder = intent["remainder"]
+        other = synthesize(remainder, evidence, subquestions=explicit_subquestions(remainder))
+        parts.append(dict(other, id=len(parts) + 1, question=remainder))
+    errors = [part["error"] for part in parts if part.get("error")]
+    model = next((part["model"] for part in parts if part.get("model")), None)
+    return {"status": "insufficient", "parts": parts,
+            "claims": [claim for part in parts for claim in part["claims"]],
+            "follow_up": " ".join(part["follow_up"] for part in parts if part.get("follow_up")),
+            **({"model": model} if model else {}), **({"error": " ".join(errors)} if errors else {})}
+
+
 def answer_question(store, question, method="natural", limit=5):
     question = question.strip()
     evidence, questions, scopes = prepare_retrieval(store, question, method, limit)
@@ -398,8 +455,11 @@ def answer_question(store, question, method="natural", limit=5):
         relevant = [item for item in evidence if item["evidence_topic"] == topic]
         # 能确定范围歧义或证据缺口时，直接给出追问或说明。
         return_policy = scope.get("return_policy", {})
+        review = review_question(text) if topic == "admissions" else None
         if topic == "library" and return_policy.get("kind") == "overlap":
             result = _library_overlap_answer(text, scope, relevant)
+        elif review and review["personal"]:
+            result = _answer_personal_review(review, relevant)
         elif scope.get("clarification"):
             result = {"status": "clarify", "claims": [], "follow_up": scope["clarification"],
                       "answer_origin": "scope_check"}

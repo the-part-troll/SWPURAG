@@ -1,0 +1,69 @@
+[
+  {
+    "id": "E01",
+    "question": "我户口在四川，但本科在外省读，预计 2027 年毕业。我参加统考选报考点时，是按四川户口选吗？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "外省高校应届毕业生原则上选择就读学校所在地省级招考机构指定的报考点", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 41}]}
+    ],
+    "wrong_scope": [
+      {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 39},
+      {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 43}
+    ],
+    "notes": "明确询问应届考生能否按四川户口选点。保留原则上及就读学校所在地的限定。往届材料和四川自考届时毕业的规则均不适用。"
+  },
+  {
+    "id": "E02",
+    "question": "我是在四川参加本科自考的，报考 2027 年硕士时还没拿到本科毕业证，届时能毕业。选四川的报考点，除了普通材料还要上传什么？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "符合四川报名要求的在川自考届时可毕业者按非应届类别，另交注册地自考办打印并加盖公章的考籍表、专科学历证明（专科文凭或学信网学籍在线验证报告）", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 43}]}
+    ],
+    "wrong_scope": [
+      {"sample": "masters-sichuan-registration-faq-2027", "paragraph": 37},
+      {"sample": "masters-admissions-charter-2027", "paragraph": 26}
+    ],
+    "notes": "这是报考点材料问题。章程第 26 段是已经获得专科学历后以同等学力报考的年限要求，不能替代自考届时可毕业者的补充材料。"
+  },
+  {
+    "id": "E03",
+    "question": "四川 2027 年研考网报里，我的审核结果是待补充材料。这个状态是什么意思？你能查出我漏交了哪一个附件、我的审核什么时候能通过吗？",
+    "expected_topics": ["admissions"],
+    "expected_status": "insufficient",
+    "expected_answer_status": "insufficient",
+    "required": [
+      {"label": "待补充意味着报名阶段材料缺失，须按报考点要求补交；没有本人审核数据，无法指出缺件或个人通过时间", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 21}]}
+    ],
+    "wrong_scope": [],
+    "notes": "说明状态并引用第 21 段。提示查看研招网本人页面的审核意见或联系所选报考点，不将公共时限写成个人审核承诺。"
+  },
+  {
+    "id": "E04",
+    "question": "我报四川的 2027 年硕士，审核显示待补充。能知道我具体缺什么、补交后什么时候审核通过吗？另外省里公开的考生补材料截止是几号几点？",
+    "expected_topics": ["admissions"],
+    "expected_status": "insufficient",
+    "expected_answer_status": "insufficient",
+    "required": [
+      {"label": "待补充提示需要按考点要求补材料，现有公开证据不能确认本人缺件或通过时间", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 21}]},
+      {"label": "公开的考生补传截止是 2026 年 10 月 31 日 12:00 前", "alternatives": [{"sample": "masters-sichuan-registration-reminder-2027", "paragraph": 11}]}
+    ],
+    "wrong_scope": [],
+    "notes": "个人与公开时间两个子问各自作答。材料审核安排到 10 月 31 日 17:00，不能解释为考生的补传期限。"
+  },
+  {
+    "id": "E05",
+    "question": "我想弄清楚四川 2027 年考研网报的审核结果都有哪些，显示待补充材料和审核通过分别是什么意思？",
+    "expected_topics": ["admissions"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "审核有通过、不通过及待补充材料三种结论；通过表示拥有考试资格，待补充表示材料缺失需按考点要求补交", "alternatives": [{"sample": "masters-sichuan-registration-faq-2027", "paragraph": 21}]}
+    ],
+    "wrong_scope": [],
+    "notes": "只问公开状态含义，无个人缺件或个人通过进度需要查询。"
+  }
+]

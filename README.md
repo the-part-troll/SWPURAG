@@ -58,6 +58,8 @@ python -B -m swpurag serve --port 8765
 
 从招生通知首页发现候选、归档并在独立库复测的命令与结果见 [栏目采集试验](reports/discovery-validation.md)。
 
+15 篇独立验证库的分段适用范围、个人审核答复和前后对照见 [扩库验收报告](reports/expansion-acceptance.md)。
+
 ## 工作区
 
 | 位置 | 用途 |
