@@ -11,7 +11,7 @@ from pathlib import Path
 from .evaluate import ArchiveCheck, read_json
 from .hybrid_eval import read_sets
 from .routing_eval import (DISCOVERY, DISCOVERY_MANIFESTS, EXPANSION, EXPANSION_SHA256,
-                           LIBRARY_DISCOVERY_SHA256, LIBRARY_HOLIDAY_SHA256)
+                           LIBRARY_DISCOVERY_SHA256, LIBRARY_HOLIDAY_SHA256, SCHOOL_CALENDAR_SHA256)
 
 
 QUESTION_IDS = ("A1", "A2", "N05", "N06", "N07", "E04", "Q6", "N04")
@@ -24,6 +24,7 @@ def main():
     parser.add_argument("--only", nargs="+")
     parser.add_argument("--library-discovery", type=Path, help="use the frozen library questions and archive manifests")
     parser.add_argument("--library-holiday", action="store_true", help="include the frozen holiday date boundary questions")
+    parser.add_argument("--school-calendar", type=Path, help="exercise the frozen school calendar suite")
     parser.add_argument("--baseline-package", type=Path, help="parent directory of the trusted historical swpurag package")
     args = parser.parse_args()
     if not (args.db or Path("data/corpus.sqlite3")).is_file():
@@ -33,8 +34,16 @@ def main():
     manifests = list(DISCOVERY_MANIFESTS)
     if args.library_discovery:
         directory = args.library_discovery
-        path, digest = directory / "acceptance.json", LIBRARY_DISCOVERY_SHA256
         manifests.append((directory / "pages.json", directory / "captures.json"))
+    if args.school_calendar:
+        directory = args.school_calendar
+        path, digest = directory / "acceptance.json", SCHOOL_CALENDAR_SHA256
+        manifests.append((directory / "pages.json", directory / "captures.json"))
+        questions = read_json(path)
+        allowed = tuple(row["id"] for row in questions)
+    elif args.library_discovery:
+        directory = args.library_discovery
+        path, digest = directory / "acceptance.json", LIBRARY_DISCOVERY_SHA256
         questions = read_json(path)
         if args.library_holiday:
             holiday = directory / "holiday-acceptance.json"

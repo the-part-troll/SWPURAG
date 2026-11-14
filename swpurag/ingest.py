@@ -51,6 +51,12 @@ def content_hash(sample, title, chunks):
         }
         if scopes:
             version["library_scopes"] = scopes
+    elif version.get("topic") == "school_calendar":
+        # 校历日期与正文一起定版，标注修订可以单独形成版本。
+        scopes = [chunk["locator"].get("calendar_scope") for chunk in chunks]
+        if not all(scopes):
+            raise ValueError("School calendar evidence requires a calendar scope for each block")
+        version["calendar_scopes"] = scopes
     payload = json.dumps(version, ensure_ascii=False, sort_keys=True).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
 

@@ -1,0 +1,45 @@
+[
+  {
+    "id": "school-calendar-2026-mid-autumn-national-day",
+    "url": "https://www.swpu.edu.cn/info/1312/44668.htm",
+    "source_key": "portal-notices",
+    "host": "www.swpu.edu.cn",
+    "path_prefix": "/info/1312/",
+    "unit": "党政办公室（校地合作办公室）",
+    "page_type": "校级放假与调休通知",
+    "published_at": "2026-09-11",
+    "topic": "school_calendar",
+    "body_selector": "#vsb_content",
+    "minimum_body_chars": 180,
+    "chunk_scopes": [
+      {
+        "contains": ["中秋节：9月25日（星期五）至27日（星期日）放假，共3天。"],
+        "calendar_scope": {
+          "year": 2026,
+          "holiday": "中秋节",
+          "effective_from": "2026-09-25",
+          "effective_to": "2026-09-27",
+          "makeup_dates": []
+        }
+      },
+      {
+        "contains": ["国庆节：10月1日（星期四）至7日（星期三）放假调休，共7天。", "9月20日（星期日）、10月10日（星期六）正常上班上课。"],
+        "calendar_scope": {
+          "year": 2026,
+          "holiday": "国庆节",
+          "effective_from": "2026-10-01",
+          "effective_to": "2026-10-07",
+          "makeup_dates": ["2026-09-20", "2026-10-10"]
+        }
+      }
+    ],
+    "exclude_blocks": [
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)", "contains": "校内各单位："},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2)", "contains": "按照学校教学日历安排"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(5)", "contains": "各单位要提前安排好假期值班工作"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(6)", "contains": "各单位要妥善安排好值班和安全、保卫等工作"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9)", "contains": "党政办公室（校地合作办公室）"},
+      {"selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(10)", "contains": "2026年9月11日"}
+    ]
+  }
+]

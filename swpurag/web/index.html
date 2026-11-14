@@ -23,12 +23,12 @@
   <main class="workspace">
     <section class="question-panel" aria-labelledby="page-title">
       <h1 class="page-title" id="page-title">查询官网资料</h1>
-      <p class="intro">支持 2027 年普通硕士招生和成都校区图书馆服务。回答会标明依据及原文位置。</p>
+      <p class="intro">支持 2027 年普通硕士招生、成都校区图书馆服务和校级放假与调休。回答会标明依据及原文位置。</p>
       <form id="ask-form" class="ask-form">
         <label for="question" class="input-label">你的问题</label>
         <textarea id="question" name="question" rows="5" maxlength="1000" placeholder="例如，成都总馆平时几点关门？" aria-describedby="question-hint" required></textarea>
         <div class="input-footer">
-          <span id="question-hint">可同时询问招生与图书馆服务</span>
+          <span id="question-hint">可在一个问题里同时查询多个主题</span>
           <button id="ask-submit" class="ask-submit" type="submit">查询资料 <span aria-hidden="true">→</span></button>
         </div>
       </form>
@@ -42,6 +42,9 @@
         </button>
         <button type="button" class="example-button" data-question="计算机与软件学院全日制085404初试第四门是什么？另外，成都总馆平时几点关门？">
           <span class="example-topic">跨主题</span><span>同时查询初试科目和开放时间</span><span class="example-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="example-button" data-question="2026 年 10 月 4 日学校还放假吗？成都一期图书馆开门吗？">
+          <span class="example-topic">跨主题</span><span>学校还放假吗，图书馆开门吗？</span><span class="example-arrow" aria-hidden="true">↗</span>
         </button>
       </section>
     </section>

@@ -210,6 +210,24 @@ def _validate_hours_periods(scope):
         end = next_end
 
 
+def _validate_calendar_scope(scope):
+    if not isinstance(scope, dict) or type(scope.get("year")) is not int:
+        raise ValueError("A calendar scope needs a year and holiday name")
+    holiday = scope.get("holiday")
+    if not isinstance(holiday, str) or not holiday.strip():
+        raise ValueError("A calendar scope needs a nonempty holiday name")
+    start, end = scope.get("effective_from"), scope.get("effective_to")
+    makeup = scope.get("makeup_dates", [])
+    if not isinstance(makeup, list):
+        raise ValueError("Calendar makeup dates must be a list")
+    for item in (start, end, *makeup):
+        if (not isinstance(item, str) or (day := date.fromisoformat(item)).isoformat() != item
+                or day.year != scope["year"]):
+            raise ValueError("Calendar dates must use YYYY-MM-DD and match the scoped year")
+    if start > end or len(makeup) != len(set(makeup)) or any(start <= day <= end for day in makeup):
+        raise ValueError("Calendar range and makeup dates must be distinct and ordered")
+
+
 def extract(body, charset, sample):
     tree = TreeParser()
     tree.feed(decode_html(body, charset))
@@ -244,8 +262,16 @@ def extract(body, charset, sample):
             marker in chunk["text"] for marker in assignment["contains"]
         )]
         if len(matching) != 1:
-            raise ValueError("Expected one HTML block for library scope markers: " + ", ".join(assignment["contains"]))
-        matching[0]["locator"].setdefault("library_scope", {}).update(assignment["scope"])
+            raise ValueError("Expected one HTML block for scope markers: " + ", ".join(assignment["contains"]))
+        locator = matching[0]["locator"]
+        if "scope" in assignment:
+            locator.setdefault("library_scope", {}).update(assignment["scope"])
+        if "calendar_scope" in assignment:
+            scope = assignment["calendar_scope"]
+            _validate_calendar_scope(scope)
+            if "calendar_scope" in locator:
+                raise ValueError("Duplicate calendar scope for one HTML block")
+            locator["calendar_scope"] = scope
     for paragraph, chunk in enumerate(chunks, 1):
         _validate_hours_periods(chunk["locator"].get("library_scope", {}))
         chunk["locator"]["paragraph"] = paragraph

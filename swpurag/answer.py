@@ -8,6 +8,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener
 
+from .calendar_scope import search_calendar
 from .capture import NoRedirect
 from .catalog_scope import search_scoped
 from .library_scope import regular_hours_question, search_library, split_library_return_question
@@ -70,6 +71,14 @@ return_policy.kind 为 carryover 时，原到期日在边界之前且指定日�
 如何计算时，只引用对应证据中有关已到期未归还的一整句，提供一个 citation。
 免超期截止日不能作为本个案的延期依据。
 引文只抄 evidence.text 内的原文，不把 metadata 拼进引文。"""
+
+CALENDAR_PROMPT = """
+只回答西南石油大学校级放假与调休上课安排。calendar_scope 标明每段的年份、节日、含首尾
+的放假区间和公告列出的调整上课日期。分别保留适用的节日、年份与日期。假期的起止和上课
+日期应各自引用原句。若问某日是否仍在指定假期，按该假期起止直接判断。原文括注的星期
+指日期对应的星期，不能据此判断补哪一天的课。学校通用安排不能证实个别学院、班级或校区
+没有例外。query_scope.unsupported 有说明时，先回答有证据的校级部分，具体课表、学院例外
+和其他缺口由系统另行提示。没有原文支持的结论不要写进 claims。"""
 
 REVIEW_STATUS_QUESTION = "四川省2027年研考网上报名的审核结果显示待补充材料，这一公开状态是什么意思？"
 REVIEW_STATUS_PROMPT = """
@@ -217,6 +226,8 @@ def topic_evidence(store, question, method, limit, *, ranker=None, trace=None):
     for topic, text in questions.items():
         if topic == "library":
             hits, scope = search_library(store, text, limit, ranker=ranker, trace=trace)
+        elif topic == "school_calendar":
+            hits, scope = search_calendar(store, text, limit, ranker=ranker, trace=trace)
         elif method == "scoped":
             hits, scope = search_scoped(store, text, limit, ADMISSION_YEAR, ranker=ranker, trace=trace)
         else:
@@ -251,7 +262,7 @@ def evidence_with_context(store, hits):
         return evidence
     header_keys = set()
     for hit in hits:
-        if hit.get("topic") == "library":
+        if hit["evidence_topic"] != "admissions":
             continue
         selector = hit["locator"].get("selector", "")
         match = re.fullmatch(r"(.+ > )tr:nth-of-type\((\d+)\)", selector)
@@ -274,7 +285,7 @@ def evidence_with_context(store, hits):
         if key in header_keys:
             add_context(row, "table_header")
     for hit in hits:
-        if hit.get("topic") == "library" or not re.match(r"^\d+[.．、]", hit["text"]):
+        if hit["evidence_topic"] != "admissions" or not re.match(r"^\d+[.．、]", hit["text"]):
             continue
         # 在同一版本内最多回看 12 段，查找能限定条款范围的标题。
         for ordinal in range(hit["ordinal"] - 1, max(0, hit["ordinal"] - 13), -1):
@@ -324,6 +335,8 @@ def synthesize(question, evidence, system_prompt=SYSTEM_PROMPT, subquestions=(),
                 )},
                 **locator.get("library_scope", {}),
             }
+        if item.get("topic") == "school_calendar":
+            entry["calendar_scope"] = locator["calendar_scope"]
         if locator.get("kind") == "pdf":
             contains_pdf = True
             entry.update(format="pdf", page=locator["page"], row=locator["row"])
@@ -387,6 +400,18 @@ def answer_library(question, scope, evidence):
         names = "、".join(sorted(fallback_buildings))
         result["scope_note"] = f"现有归档未找到{names}在{scope['date']}适用的临时开放安排。仅有常规时段可供参考。"
     if gaps and result["status"] == "answered":
+        result.update(status="insufficient", follow_up=gaps)
+    return result
+
+
+def answer_calendar(question, scope, evidence):
+    gaps = " ".join(scope["unsupported"])
+    if not evidence:
+        return {"status": "insufficient", "claims": [],
+                "follow_up": gaps or "本轮未找到适用的校级放假与调休通知。", "answer_origin": "scope_check"}
+    prompt = SYSTEM_PROMPT.replace("2027 年普通硕士招生", "校级放假与调休", 1) + CALENDAR_PROMPT
+    result = synthesize(question, evidence, prompt, query_scope=scope)
+    if gaps and result["status"] != "unavailable":
         result.update(status="insufficient", follow_up=gaps)
     return result
 
@@ -488,6 +513,8 @@ def answer_question(store, question, method="natural", limit=5):
                 result = library_return_policy(return_policy, relevant)
             else:
                 result = answer_library(text, scope, relevant)
+        elif topic == "school_calendar":
+            result = answer_calendar(text, scope, relevant)
         else:
             result = synthesize(text, relevant, subquestions=explicit_subquestions(text))
         parts[topic] = result

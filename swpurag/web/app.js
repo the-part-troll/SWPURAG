@@ -12,7 +12,9 @@ const evidenceSection = document.querySelector("#evidence-section");
 const evidenceCount = document.querySelector("#evidence-count");
 const evidenceList = document.querySelector("#evidence-list");
 
-const topics = new Map([["admissions", "硕士招生"], ["library", "图书馆服务"]]);
+const topics = new Map([
+  ["admissions", "硕士招生"], ["library", "图书馆服务"], ["school_calendar", "校级放假与调休"],
+]);
 const statuses = new Map([
   ["answered", "已找到依据"], ["partial", "部分已回答"], ["clarify", "需要补充"],
   ["insufficient", "证据不足"], ["unavailable", "回答暂不可用"], ["error", "查询失败"],
@@ -102,6 +104,7 @@ function scopeText(scope) {
   const dateNote = scope.date_source === "assumed_year" ? "（年份按当前年）" : "";
   const schedule = scope.date ? `${scope.date}${dateNote}` : noticeKinds.get(scope.notice_kind);
   return [scope.campus, scope.building, schedule, readerGroups.get(scope.reader_group),
+    scope.holidays?.join("、"),
     scope.study_modes?.join("、"), scope.colleges?.join("、"), scope.program_codes?.join("、"),
   ].filter(Boolean).join(" · ");
 }
@@ -169,6 +172,13 @@ function applicability(item, locator) {
     const range = { ...item, ...locator.library_scope };
     return [range.campus, range.building, noticeKinds.get(range.notice_kind), readerGroups.get(range.reader_group),
       range.effective_from && range.effective_to && `${range.effective_from} 至 ${range.effective_to}`,
+    ].filter(Boolean).join(" · ");
+  }
+  if (item.evidence_topic === "school_calendar") {
+    const range = locator.calendar_scope || {};
+    return [range.holiday,
+      range.effective_from && range.effective_to && `${range.effective_from} 至 ${range.effective_to}`,
+      range.makeup_dates?.length && `调休上课 ${range.makeup_dates.join("、")}`,
     ].filter(Boolean).join(" · ");
   }
   return [item.admission_year && `${item.admission_year} 年招生`, locator.study_mode, item.audience].filter(Boolean).join(" · ");

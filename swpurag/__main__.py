@@ -16,6 +16,9 @@ from .retrieval import search_natural
 from .store import Store
 
 
+TOPIC_LABELS = {"admissions": "硕士招生", "library": "图书馆服务", "school_calendar": "校级放假与调休"}
+
+
 def read_json(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
@@ -94,26 +97,49 @@ def print_matches(results, query):
                 if scope.get("effective_from") and scope.get("effective_to"):
                     applies.append("{} 至 {}".format(scope["effective_from"], scope["effective_to"]))
                 print("适用 {}".format(" · ".join(applies)))
+            if result.get("topic") == "school_calendar":
+                scope = locator.get("calendar_scope", {})
+                applies = [scope.get("holiday")]
+                if scope.get("effective_from") and scope.get("effective_to"):
+                    applies.append("{} 至 {}".format(scope["effective_from"], scope["effective_to"]))
+                if scope.get("makeup_dates"):
+                    applies.append("调休上课 " + "、".join(scope["makeup_dates"]))
+                if any(applies):
+                    print("适用 {}".format(" · ".join(value for value in applies if value)))
         print("原件 {} · 版本 {} · 抓取 {}".format(
             result["raw_path"], result["version_id"], result["fetched_at"]
         ))
         print()
 
 
-def print_answer(result):
+def print_answer_body(result):
     if result.get("scope_note"):
         print(result["scope_note"])
     if result["status"] == "unavailable":
-        print("模型回答不可用。{}".format(result["error"]))
-        if not result["claims"]:
-            print_matches(result["evidence"], result["question"])
-            return
+        print("模型回答不可用。{}".format(result.get("error", "")))
     for claim in result["claims"]:
         ids = sorted({citation["id"] for citation in claim["citations"]})
         print("{} {}".format(claim["text"], " ".join("[{}]".format(index) for index in ids)))
     if result.get("follow_up"):
         label = "需要补充" if result["status"] == "clarify" else "证据缺口"
         print("{} {}".format(label, result["follow_up"]))
+
+
+def print_answer(result):
+    if result.get("topic_answers"):
+        # 分主题显示回答，所有引文仍沿用本次问答统一编号。
+        for index, (topic, answer) in enumerate(result["topic_answers"].items()):
+            if index:
+                print()
+            print("【{}】".format(TOPIC_LABELS.get(topic, "回答")))
+            print_answer_body(answer)
+    else:
+        if result.get("topics") == ["school_calendar"]:
+            print("【{}】".format(TOPIC_LABELS["school_calendar"]))
+        print_answer_body(result)
+    if result["status"] == "unavailable" and not result["claims"]:
+        print_matches(result["evidence"], result["question"])
+        return
     # 保留本次问答的证据编号，仅展示回答实际引用的摘录。
     quotes = {}
     for claim in result["claims"]:
@@ -150,7 +176,7 @@ def main():
     search_modes.add_argument("--natural", action="store_true", help="rank evidence for a natural question")
     search_modes.add_argument("--scoped", action="store_true", help="rank 2027 admissions evidence with study mode and college scope")
     search.add_argument("--admission-year", type=int, help="filter to the given admission cycle")
-    ask = commands.add_parser("ask", help="answer a master's admissions or Chengdu library question with citations")
+    ask = commands.add_parser("ask", help="answer a master's admissions, library or university calendar question with citations")
     ask.add_argument("query")
     ask.add_argument("--limit", type=int, choices=range(1, 11), default=5)
     ask.add_argument("--retriever", choices=("scoped", "natural", "keyword"), default="scoped")

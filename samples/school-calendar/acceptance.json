@@ -1,0 +1,99 @@
+[
+  {
+    "id": "S01",
+    "question": "西南石油大学 2026 年中秋和国庆各从哪天放到哪天？一共分别休几天？",
+    "expected_topics": ["school_calendar"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "中秋 9 月 25–27 日，共 3 天", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 3}]},
+      {"label": "国庆 10 月 1–7 日，共 7 天", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 4}]}
+    ],
+    "wrong_scope": [{"sample": "library-chengdu-2026-autumn-holiday"}],
+    "notes": "两段假期分别回答，馆舍闭馆日不能代替学校放假安排。"
+  },
+  {
+    "id": "S02",
+    "question": "学校 2026 年国庆调休是哪两个周末要正常上课？麻烦把日期都列一下。",
+    "expected_topics": ["school_calendar"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "9 月 20 日（星期日）、10 月 10 日（星期六）正常上课", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 4}]}
+    ],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 3}, {"sample": "library-chengdu-2026-autumn-holiday"}],
+    "notes": "必须包括 9 月 20 日，周末正常上课的日期与国庆假期本身分开。"
+  },
+  {
+    "id": "S03",
+    "question": "2026 年 10 月 4 日学校还放假吗？成都一期图书馆开门吗？",
+    "expected_topics": ["school_calendar", "library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "国庆校级假期为 10 月 1–7 日", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 4}]},
+      {"label": "图书馆 10 月 1–3 日闭馆，假期其余日期正常开放", "alternatives": [{"sample": "library-chengdu-2026-autumn-holiday", "paragraph": 2}]}
+    ],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 3}, {"sample": "library-chengdu-2026-autumn-extension"}, {"sample": "library-chengdu-2025-autumn-extension"}],
+    "notes": "两部分沿用同一个 10 月 4 日，分别回答学校还在放假与一期图书馆正常开放，分别引用对应原件。"
+  },
+  {
+    "id": "S04",
+    "question": "2026 年 10 月 8 日学校还在放国庆假吗？",
+    "expected_topics": ["school_calendar"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "国庆假期截至 10 月 7 日，10 月 8 日不在这一假期内", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 4}]}
+    ],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 3}, {"sample": "library-chengdu-2026-autumn-holiday"}],
+    "notes": "只判断是否仍属已公布国庆假期，不延伸到 10 月 8 日当天的具体课表。"
+  },
+  {
+    "id": "S05",
+    "question": "2026 年 10 月 10 日学校要上课吗？如果要上，是补星期几的课？",
+    "expected_topics": ["school_calendar"],
+    "expected_status": "insufficient",
+    "expected_answer_status": "insufficient",
+    "required": [
+      {"label": "学校通知明确 10 月 10 日正常上课", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 4}]}
+    ],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 3}, {"sample": "library-chengdu-2026-autumn-holiday"}],
+    "notes": "先引用通知回答正常上课，再明确通知没有写明补星期几的课程。不能把星期六误答为补星期六的课。"
+  },
+  {
+    "id": "S06",
+    "question": "2026 年 10 月 10 日调休，计算机与软件学院有没有单独的不上课安排？",
+    "expected_topics": ["school_calendar"],
+    "expected_status": "insufficient",
+    "expected_answer_status": "insufficient",
+    "required": [
+      {"label": "校级通知只说明 10 月 10 日学校正常上课", "alternatives": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 4}]}
+    ],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day", "paragraph": 3}, {"sample": "library-chengdu-2026-autumn-holiday"}],
+    "notes": "可附校级通用安排，必须说明计算机与软件学院有无例外缺证据。不得用全校通用通知排除学院例外。"
+  },
+  {
+    "id": "S07",
+    "question": "西南石油大学 2026 年元旦学校放哪几天假？",
+    "expected_topics": ["school_calendar"],
+    "expected_status": "insufficient",
+    "expected_answer_status": "insufficient",
+    "required": [],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day"}, {"sample": "library-chengdu-2026-autumn-holiday"}],
+    "notes": "缺少校级元旦安排。不使用已归档的中秋国庆通知或馆舍开闭馆公告作答。"
+  },
+  {
+    "id": "S08",
+    "question": "2026 年 9 月 26 日成都二期图书馆开放吗，早上几点可以进？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "图书馆中秋仅 9 月 25 日闭馆，其余假期日期正常开放", "alternatives": [{"sample": "library-chengdu-2026-autumn-holiday", "paragraph": 2}]},
+      {"label": "成都二期分馆常规 8:00 开馆", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 23}]}
+    ],
+    "wrong_scope": [{"sample": "school-calendar-2026-mid-autumn-national-day"}, {"sample": "library-chengdu-hours", "paragraph": 1}],
+    "notes": "馆舍开放结论和钟点分别引用图书馆公告及二期常规表，校级安排不参与此问。"
+  }
+]
