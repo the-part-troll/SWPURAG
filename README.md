@@ -63,6 +63,8 @@ python -B -m swpurag serve --port 8765
 
 默认库切换、回滚及三类浏览器实测见 [默认库更新记录](reports/default-corpus-promotion.md)。
 
+图书馆通知栏目试点使用独立候选库。采集、离线导入和问答对照见 [图书馆栏目试点报告](reports/library-discovery-validation.md)。
+
 ## 工作区
 
 | 位置 | 用途 |

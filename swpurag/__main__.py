@@ -101,6 +101,8 @@ def print_matches(results, query):
 
 
 def print_answer(result):
+    if result.get("scope_note"):
+        print(result["scope_note"])
     if result["status"] == "unavailable":
         print("模型回答不可用。{}".format(result["error"]))
         if not result["claims"]:

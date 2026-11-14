@@ -1,0 +1,22 @@
+[
+  {
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260915.html",
+    "fetched_at": "2026-11-14T19:49:51+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260915.html",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "c91e063ecf799b82442f4d4db2d858df1eb43f732bd265c2752dc262cff02fb9",
+    "raw_path": "raw/c91e063ecf799b82442f4d4db2d858df1eb43f732bd265c2752dc262cff02fb9.html"
+  },
+  {
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20251020.html",
+    "fetched_at": "2026-11-14T19:49:53+08:00",
+    "final_url": "https://lib.swpu.edu.cn/1849.8080/noticex/20251020.html",
+    "http_status": 200,
+    "content_type": "text/html",
+    "charset": "utf-8",
+    "raw_sha256": "d0e9ffd3798fe887f3c21d1d8909e080515e8e655fac6c19de2e55761c267652",
+    "raw_path": "raw/d0e9ffd3798fe887f3c21d1d8909e080515e8e655fac6c19de2e55761c267652.html"
+  }
+]

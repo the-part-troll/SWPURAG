@@ -6,7 +6,7 @@ import json
 import sqlite3
 import sys
 import time
-from contextlib import closing
+from contextlib import closing, contextmanager, nullcontext
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
@@ -28,6 +28,7 @@ EXPANSION = Path("samples/discovery/expansion-acceptance.json")
 EXPANSION_NEGATIVES = Path("samples/discovery/expansion-negatives.json")
 EXPANSION_SHA256 = "4721faab4f77cbb804d29e6f3a9d9adf7b3febf7c5d106b38ba9aea314a1072d"
 EXPANSION_NEGATIVES_SHA256 = "ef95fa39d175a48f882cdefedb2b7a533076aea827c26364d98f261cf05b6304"
+LIBRARY_DISCOVERY_SHA256 = "78c3b5c65aece48912f306b7236f5679b4dbf0149f3ac293f94f01d5b4daaab4"
 
 
 def load_baseline(path):
@@ -44,7 +45,7 @@ def load_baseline(path):
 
 
 def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), discovery=(),
-        expansion=(), negative_overlay=None, archive=None):
+        expansion=(), negative_overlay=None, archive=None, library=(), library_label_store=None):
     rows = list(store.current_chunks())
     if archive is None and (store.stats()["documents"], len(rows)) != (13, 747):
         raise ValueError("The routing comparison requires the original 13 documents and 747 blocks")
@@ -64,10 +65,15 @@ def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), di
         validate_labels(discovery, rows, samples, archive, size=(6, 8))
     if expansion:
         validate_labels(expansion, rows, samples, archive, size=(4, 6))
+    if library:
+        # 新公告在基线库中缺失，仍以候选库和归档原件核验同一套冻结标注。
+        label_rows = list(library_label_store.current_chunks()) if library_label_store else rows
+        validate_labels(library, label_rows, samples, archive, size=(6, 8))
     suite_by_id = {q["id"]: suite for suite, dataset in
                    (("routing-acceptance", acceptance), ("boundary-acceptance", boundary),
-                    ("discovery-acceptance", discovery), ("expansion-acceptance", expansion)) for q in dataset}
-    questions = frozen + old + acceptance + list(boundary) + list(discovery) + list(expansion)
+                    ("discovery-acceptance", discovery), ("expansion-acceptance", expansion),
+                    ("library-discovery", library)) for q in dataset}
+    questions = frozen + old + acceptance + list(boundary) + list(discovery) + list(expansion) + list(library)
     negative_overlay = negative_overlay or {}
     if set(negative_overlay) - {q["id"] for q in questions}:
         raise ValueError("Wrong-scope overlay refers to an unknown question")
@@ -117,6 +123,8 @@ def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), di
                                                    result["required_groups_in_candidate_pool"]):
             if ranks:
                 stages.append(None)
+            elif result["suite"] == "library-discovery" and not target_topics:
+                stages.append("not_in_corpus")
             elif not target_topics & topics.keys():
                 stages.append("topic_routing")
             else:
@@ -124,6 +132,17 @@ def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), di
         result["missing_group_stages"] = stages
         result["archived_top5_verified"] = all(archive.verify(row) for row in hits)
         output.write(json.dumps(result, ensure_ascii=False) + "\n")
+
+
+@contextmanager
+def read_only_store(path):
+    # 直接以只读模式打开，避免 Store 初始化时尝试建表或迁移。
+    uri = path.resolve().as_uri() + "?mode=ro"
+    with closing(sqlite3.connect(uri, uri=True)) as connection:
+        connection.row_factory = sqlite3.Row
+        store = Store.__new__(Store)
+        store.db = connection
+        yield store
 
 
 def main():
@@ -134,11 +153,15 @@ def main():
     parser.add_argument("--db", type=Path, default=Path("data/corpus.sqlite3"))
     parser.add_argument("--discovery", action="store_true", help="include the frozen discovery acceptance set")
     parser.add_argument("--expansion", action="store_true", help="include the expansion acceptance set and scope overlay")
+    parser.add_argument("--library-discovery", type=Path, help="library notice manifests and frozen questions")
+    parser.add_argument("--library-label-db", type=Path, help="validate new labels against this database when replaying the baseline")
     args = parser.parse_args()
     if args.expansion and not (args.boundary and args.discovery):
         parser.error("expansion replay requires --boundary and --discovery")
     if args.discovery and args.db.resolve() == Path("data/corpus.sqlite3").resolve():
         parser.error("the discovery suite requires --db for an isolated validation database")
+    if args.library_label_db and not (args.library_discovery and args.library_label_db.is_file()):
+        parser.error("--library-label-db requires --library-discovery and an existing database")
     if not args.db.is_file():
         parser.error("database does not exist")
     raw = ACCEPTANCE.read_bytes().replace(b"\r\n", b"\n")
@@ -158,24 +181,30 @@ def main():
         if hashlib.sha256(raw).hexdigest() != DISCOVERY_SHA256:
             parser.error("discovery file differs from the frozen questions")
         discovery = read_json(DISCOVERY)
-    archive = ArchiveCheck(Path("data"), extra_manifests=DISCOVERY_MANIFESTS) if args.discovery else None
+    manifests = list(DISCOVERY_MANIFESTS) if args.discovery else []
+    library = ()
+    if args.library_discovery:
+        directory = args.library_discovery
+        path = directory / "acceptance.json"
+        if hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != LIBRARY_DISCOVERY_SHA256:
+            parser.error("library discovery file differs from the frozen questions")
+        library = read_json(path)
+        manifests.append((directory / "pages.json", directory / "captures.json"))
+    archive = ArchiveCheck(Path("data"), extra_manifests=manifests) if manifests else None
     expansion, overlay = (), None
     if args.expansion:
         for path, digest in ((EXPANSION, EXPANSION_SHA256), (EXPANSION_NEGATIVES, EXPANSION_NEGATIVES_SHA256)):
             if hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != digest:
                 parser.error(f"{path} differs from the frozen annotations")
         expansion, overlay = read_json(EXPANSION), read_json(EXPANSION_NEGATIVES)
-    # 评测只需要读取当前版本。直接以只读模式打开，避免 Store 初始化时尝试建表或迁移。
-    uri = args.db.resolve().as_uri() + "?mode=ro"
-    with closing(sqlite3.connect(uri, uri=True)) as connection:
-        connection.row_factory = sqlite3.Row
-        store = Store.__new__(Store)
-        store.db = connection
-        if args.expansion and (store.stats()["documents"], store.stats()["chunks"]) != (15, 813):
+    labels = read_only_store(args.library_label_db) if args.library_label_db else nullcontext()
+    with read_only_store(args.db) as store, labels as library_label_store:
+        if args.expansion and not library and (store.stats()["documents"], store.stats()["chunks"]) != (15, 813):
             parser.error("expansion replay requires the 15-document, 813-block validation database")
         with args.output.open("x", encoding="utf-8") as output:
             run(store, output, acceptance, prepare, boundary=boundary, discovery=discovery,
-                expansion=expansion, negative_overlay=overlay, archive=archive)
+                expansion=expansion, negative_overlay=overlay, archive=archive, library=library,
+                library_label_store=library_label_store)
     print("Saved", args.output)
 
 

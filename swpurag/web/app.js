@@ -85,6 +85,7 @@ function appendClaims(target, claims, availableIds) {
 }
 
 function appendAnswerBody(target, result, availableIds) {
+  if (result.scope_note) target.append(element("p", "scope-summary", result.scope_note));
   appendClaims(target, result.claims, availableIds);
   if (result.error || result.status === "unavailable") {
     target.append(notice("unavailable", result.error || "本次未能生成回答，可查看下方已找到的原文。"));

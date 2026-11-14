@@ -1,0 +1,83 @@
+[
+  {
+    "id": "library-chengdu-2026-autumn-holiday",
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260915.html",
+    "source_key": "library-notices",
+    "host": "lib.swpu.edu.cn",
+    "path_prefix": "/1849.8080/noticex/",
+    "unit": "西南石油大学图书馆",
+    "page_type": "节假日开放安排通知",
+    "published_at": "2026-09-15",
+    "topic": "library",
+    "campus": "成都校区",
+    "building": "成都总馆、成都分馆",
+    "notice_kind": "temporary",
+    "body_selector": "#vv_content",
+    "minimum_body_chars": 70,
+    "chunk_scopes": [
+      {
+        "contains": [
+          "图书馆总馆、分馆2026年中秋节、国庆节期间开放安排如下",
+          "9月25日，闭馆1天",
+          "10月1日-3日，闭馆3天",
+          "其余日期均正常开放"
+        ],
+        "scope": {
+          "service": "hours",
+          "hours_periods": [
+            {
+              "effective_from": "2026-09-25",
+              "effective_to": "2026-09-25",
+              "hours_aspect": "closed"
+            },
+            {
+              "effective_from": "2026-09-26",
+              "effective_to": "2026-09-30",
+              "hours_aspect": "regular_resume"
+            },
+            {
+              "effective_from": "2026-10-01",
+              "effective_to": "2026-10-03",
+              "hours_aspect": "closed"
+            },
+            {
+              "effective_from": "2026-10-04",
+              "effective_to": "2026-10-04",
+              "hours_aspect": "regular_resume"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "library-chengdu-2025-autumn-extension",
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20251020.html",
+    "source_key": "library-notices",
+    "host": "lib.swpu.edu.cn",
+    "path_prefix": "/1849.8080/noticex/",
+    "unit": "西南石油大学图书馆",
+    "page_type": "晚间开放延长通知",
+    "published_at": "2025-10-20",
+    "topic": "library",
+    "campus": "成都校区",
+    "building": "成都总馆、成都分馆",
+    "notice_kind": "temporary",
+    "effective_from": "2025-10-20",
+    "effective_to": "2025-12-20",
+    "body_selector": "#vv_content",
+    "minimum_body_chars": 60,
+    "chunk_scopes": [
+      {
+        "contains": [
+          "2025年10月20日至12月20日期间",
+          "成都校区图书馆总馆、分馆晚间开放时间延长到22:30"
+        ],
+        "scope": {
+          "service": "hours",
+          "hours_aspect": "evening_only"
+        }
+      }
+    ]
+  }
+]

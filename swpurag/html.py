@@ -190,6 +190,26 @@ def validate_body(region, chunks, sample):
             raise ValueError("Body region is missing configured anchors: " + ", ".join(sorted(missing)))
 
 
+def _validate_hours_periods(scope):
+    if "hours_periods" not in scope:
+        return
+    periods = scope["hours_periods"]
+    if not isinstance(periods, list) or not periods or scope.get("service") != "hours":
+        raise ValueError("Expected nonempty hours_periods on an hours block")
+    end = None
+    for period in periods:
+        if not isinstance(period, dict) or period.get("hours_aspect") not in ("closed", "regular_resume"):
+            raise ValueError("Invalid hours_periods entry")
+        start_text, end_text = period.get("effective_from"), period.get("effective_to")
+        if not all(isinstance(day, str) for day in (start_text, end_text)):
+            raise ValueError("hours_periods entries require a start and end date")
+        start, next_end = date.fromisoformat(start_text), date.fromisoformat(end_text)
+        if (start.isoformat() != start_text or next_end.isoformat() != end_text or start > next_end
+                or (end is not None and start <= end)):
+            raise ValueError("hours_periods must use ordered, non-overlapping YYYY-MM-DD intervals")
+        end = next_end
+
+
 def extract(body, charset, sample):
     tree = TreeParser()
     tree.feed(decode_html(body, charset))
@@ -227,6 +247,7 @@ def extract(body, charset, sample):
             raise ValueError("Expected one HTML block for library scope markers: " + ", ".join(assignment["contains"]))
         matching[0]["locator"].setdefault("library_scope", {}).update(assignment["scope"])
     for paragraph, chunk in enumerate(chunks, 1):
+        _validate_hours_periods(chunk["locator"].get("library_scope", {}))
         chunk["locator"]["paragraph"] = paragraph
 
     # 排除已确认不适用的段落，原件仍完整保留，后续段落继续使用原编号。

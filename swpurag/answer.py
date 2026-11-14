@@ -10,7 +10,7 @@ from urllib.request import Request, build_opener
 
 from .capture import NoRedirect
 from .catalog_scope import search_scoped
-from .library_scope import search_library, split_library_return_question
+from .library_scope import regular_hours_question, search_library, split_library_return_question
 from .retrieval import explicit_subquestions, search_admission_question
 from .review_scope import review_candidates, review_question, status_quote
 from .topics import interleave_hits, topic_questions
@@ -361,13 +361,31 @@ def library_return_policy(policy, evidence):
 
 def answer_library(question, scope, evidence):
     prompt = SYSTEM_PROMPT.replace("2027 年普通硕士招生", "成都校区图书馆服务", 1) + LIBRARY_PROMPT
-    if scope.get("no_applicable_extension"):
-        prompt += ("\n问题问延时是否适用，而检索仅找到常规开放。先直接说明归档的延时安排"
-                   "没有覆盖查询日期。只引用常规时段，不推断是否另有未收录的通知。")
+    schedules = scope.get("hours_schedule", {})
+    if schedules:
+        prompt += ("\nquery_scope.hours_schedule 按馆舍给出查询日期已匹配的开放安排。"
+                   "closed 表示当天闭馆，用含查询日的闭馆原句逐字引用，直接说明无法入馆；"
+                   "不要引用同段列出的其他节日或‘其余日期’作为当天安排。"
+                   "regular_resume 表示当天按公告正常开放，用公告的恢复条款作证；"
+                   "若用户同时问具体时间，另引用同馆的常规开放原文给出钟点。"
+                   "每条结论使用 evidence 给出的整数 id，quote 逐字从对应证据的 text 中复制。")
+    fallback_buildings = {building for building, aspect in schedules.items() if aspect == "regular_fallback"}
+    if fallback_buildings:
+        prompt += ("\n对 regular_fallback 的馆舍，只写常规时段并引用常规表。"
+                   "事实条目不复述具体查询日期，不用‘当天’、‘当日’、‘当晚’确认实际开放时间。"
+                   "示例：‘该馆常规开放至22:00。’系统另给查询范围说明，模型只写可引用的事实。")
     gaps = " ".join(scope.get("unsupported") or [])
     if gaps and not evidence:
         return {"status": "insufficient", "claims": [], "follow_up": gaps, "answer_origin": "scope_check"}
-    result = synthesize(question, evidence, prompt, query_scope=scope)
+    model_scope = scope
+    if scope.get("services") == ["hours"] and fallback_buildings == set((scope.get("building") or "").split("、")):
+        # 全部馆舍只有常规证据时，生成事实不需要具体查询日期。
+        question = regular_hours_question(question)
+        model_scope = {key: value for key, value in scope.items() if key not in {"date", "date_source"}}
+    result = synthesize(question, evidence, prompt, query_scope=model_scope)
+    if fallback_buildings:
+        names = "、".join(sorted(fallback_buildings))
+        result["scope_note"] = f"现有归档未找到{names}在{scope['date']}适用的临时开放安排。仅有常规时段可供参考。"
     if gaps and result["status"] == "answered":
         result.update(status="insufficient", follow_up=gaps)
     return result
@@ -383,8 +401,10 @@ def _library_overlap_answer(question, scope, evidence):
     # 另一子问沿用已筛选的证据，公告中的还书日期和引文都只归还书子问。
     other_evidence = [row for row in evidence if row["chunk_id"] != policy["chunk_id"]
                       and row.get("locator", {}).get("library_scope", {}).get("loan_aspect") != "holiday_return"]
-    other_scope = {key: value for key, value in scope.items()
-                   if key not in {"loan_dates", "return_policy", "date", "date_source"}}
+    return_fields = {"loan_dates", "return_policy"}
+    if "hours" not in scope.get("services", ()):
+        return_fields.update(("date", "date_source"))
+    other_scope = {key: value for key, value in scope.items() if key not in return_fields}
     if scope.get("clarification"):
         rest = {"status": "clarify", "claims": [], "follow_up": scope["clarification"],
                 "answer_origin": "scope_check"}
@@ -398,7 +418,7 @@ def _library_overlap_answer(question, scope, evidence):
         "claims": boundary["claims"] + rest["claims"],
         "follow_up": " ".join(value for value in (boundary["follow_up"], rest.get("follow_up")) if value),
         "parts": [dict(boundary, question=returned, id=1), dict(rest, question=other, id=2)],
-        **{key: rest[key] for key in ("error", "model") if key in rest},
+        **{key: rest[key] for key in ("error", "model", "scope_note") if key in rest},
     }
 
 
@@ -487,4 +507,7 @@ def answer_question(store, question, method="natural", limit=5):
         errors = [part["error"] for part in parts.values() if part.get("error")]
         if errors:
             result["error"] = " ".join(errors)
+        notes = [part["scope_note"] for part in parts.values() if part.get("scope_note")]
+        if notes:
+            result["scope_note"] = " ".join(notes)
     return dict(result, question=question, topics=list(questions), retriever=method, evidence=evidence)

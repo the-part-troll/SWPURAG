@@ -1,0 +1,132 @@
+[
+  {
+    "id": "J01",
+    "question": "2026 年 10 月 2 日我想去成都一期图书馆自习，那天开门吗？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "2026 年国庆节期间成都总馆和分馆 10 月 1–3 日闭馆，10 月 2 日在闭馆范围内", "alternatives": [{"sample": "library-chengdu-2026-autumn-holiday", "paragraph": 2}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours"},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2025-autumn-extension"}
+    ],
+    "notes": "引用国庆闭馆条款。常规时间表不能作为这天可以入馆的依据。"
+  },
+  {
+    "id": "J02",
+    "question": "2026 年 10 月 4 日去成都总馆，图书馆已经恢复了没？早上几点开门，晚上几点关门？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "国庆闭馆截至 10 月 3 日，公告写明其余日期均正常开放", "alternatives": [{"sample": "library-chengdu-2026-autumn-holiday", "paragraph": 2}]},
+      {"label": "成都一期总馆的常规时段是 8:00–22:00", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 1}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2025-autumn-extension"}
+    ],
+    "notes": "恢复依据和具体钟点分别引用对应原件。假期公告本身没有列出钟点。"
+  },
+  {
+    "id": "J03",
+    "question": "2026 年 9 月 25 日中秋节，成都二期图书馆还能进去看书吗？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "中秋闭馆条款适用于总馆和分馆，明确 2026 年 9 月 25 日闭馆一天", "alternatives": [{"sample": "library-chengdu-2026-autumn-holiday", "paragraph": 2}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours"},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2025-autumn-extension"}
+    ],
+    "notes": "用中秋的一天闭馆条款说明二期也闭馆，并保留正确日期。"
+  },
+  {
+    "id": "J04",
+    "question": "查一下 2025 年 11 月 10 日，成都二期图书馆晚上 10 点 15 分还能自习吗，到几点关门？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "成都总馆、分馆在 2025 年 10 月 20 日至 12 月 20 日晚间开放延长至 22:30", "alternatives": [{"sample": "library-chengdu-2025-autumn-extension", "paragraph": 2}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2026-autumn-holiday"},
+      {"sample": "library-chengdu-hours"}
+    ],
+    "notes": "22:15 在公告所示开放时间内。即使同名公告的钟点相同，也必须引用适用的 2025 年原件。"
+  },
+  {
+    "id": "J05",
+    "question": "查一下 2026 年 11 月 10 日，成都二期图书馆晚上 10 点 15 分还能自习吗，到几点关门？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "成都总馆、分馆在 2026 年 10 月 19 日至 12 月 18 日晚间开放延长至 22:30", "alternatives": [{"sample": "library-chengdu-2026-autumn-extension", "paragraph": 2}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2025-autumn-extension"},
+      {"sample": "library-chengdu-2026-autumn-holiday"},
+      {"sample": "library-chengdu-hours"}
+    ],
+    "notes": "与 J04 仅年份不同，2026 年的问句必须引用 2026 年原件，起止日期也不能沿用 2025 年公告。"
+  },
+  {
+    "id": "J06",
+    "question": "2026 年 10 月 2 日南充校区图书馆开门吗？我人在南充校区，想找地方自习。",
+    "expected_topics": ["library"],
+    "expected_status": "insufficient",
+    "expected_answer_status": "insufficient",
+    "required": [],
+    "wrong_scope": [
+      {"sample": "library-chengdu-2026-autumn-holiday"},
+      {"sample": "library-chengdu-hours"},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2025-autumn-extension"}
+    ],
+    "notes": "本轮档案没有南充馆舍当天可核实的安排。不能把成都馆舍的闭馆或开放时间套给南充。"
+  },
+  {
+    "id": "J07",
+    "question": "2026 年 10 月 16 日成都一期图书馆晚上几点关门？我怕去了才发现时间有变。",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "成都一期总馆常规关门时间为 22:00", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 1}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 23},
+      {"sample": "library-chengdu-2026-autumn-holiday"},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2025-autumn-extension"}
+    ],
+    "notes": "未找到 10 月 16 日适用的专项安排，22:00 应标明是常规闭馆时间。"
+  },
+  {
+    "id": "J08",
+    "question": "2026 年 9 月 26 日是中秋第二天，成都二期图书馆开不开？如果开，我早上几点能进？",
+    "expected_topics": ["library"],
+    "expected_status": "evidence",
+    "expected_answer_status": "answered",
+    "required": [
+      {"label": "中秋闭馆仅 9 月 25 日，其余日期正常开放", "alternatives": [{"sample": "library-chengdu-2026-autumn-holiday", "paragraph": 2}]},
+      {"label": "成都二期分馆的常规开馆时间是 8:00", "alternatives": [{"sample": "library-chengdu-hours", "paragraph": 23}]}
+    ],
+    "wrong_scope": [
+      {"sample": "library-chengdu-hours", "paragraph": 1},
+      {"sample": "library-chengdu-2026-autumn-extension"},
+      {"sample": "library-chengdu-2025-autumn-extension"}
+    ],
+    "notes": "所问日期在两段闭馆安排之间。引用通知确定正常开放，再引用二期常规表给出开馆时刻。"
+  }
+]

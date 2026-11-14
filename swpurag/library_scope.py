@@ -15,7 +15,8 @@ _BUILDINGS = {
     _MAIN: r"总馆|一期(?:图书馆|馆)?|主馆",
     _BRANCH: r"分馆|二期(?:图书馆|馆)?|明辨楼\s*f\s*区",
 }
-_HOURS = re.compile(r"开馆|关馆|闭馆|关门|开放|开门|开到|自习|能进|入馆|营业|阅览")
+_HOURS = re.compile(r"开馆|关馆|闭馆|关门|开放|开门|开到|自习|能进|入馆|营业|阅览|开不开|还开吗|恢复了(?:吗|没)")
+_CLOCK_QUESTION = re.compile(r"几点|多早|最晚|什么时间|何时|时间|时段|营业多久|(?:上午|下午|晚上)\s*\d")
 _MACHINE = re.compile(r"(?:自动|自助)(?:借还|还书|借书)|(?:借还|还书)(?:机|仪)")
 _LOANS = re.compile(r"借阅|借书|借的书|还书|续借|续期|能续|可续|借期|归还|借还|借几本|借多少本|外借|超期")
 _REALTIME = re.compile(r"(?:剩|还有|空余|空闲|空着|实时|余量|有没有).{0,10}(?:座位|座席|空位)|(?:座位|座席|空位).{0,10}(?:剩|空余|余量|空着)|余座")
@@ -97,6 +98,11 @@ def _query_date(question, today):
     if _UNRESOLVED_PERIOD.search(question):
         return None, None, "请问具体是哪一天？寒暑假和节假日的开放安排可能不同。"
     return None, "regular" if regular else None, None
+
+
+def regular_hours_question(question):
+    """Keep the services and clock question when only regular hours are supported."""
+    return _RELATIVE_DATE.sub("", _MONTH_DAY.sub("", _FULL_DATE.sub("", _search_text(question)))).strip()
 
 
 def _return_date_role(before, after):
@@ -210,20 +216,37 @@ def _active(scope, day):
     return bool(day and start and end and start <= day <= end)
 
 
+def _hours_period(scope, day):
+    # 一个原文段落可列出多段不同日期和安排，检索时只激活当日那段。
+    periods = scope.get("hours_periods", [scope])
+    return next((period for period in periods if _active(period, day)), None)
+
+
 def _hours_rows(rows, building, day):
     eligible = [(row, sc) for row, sc in rows if _covers(sc, building)]
     regular = [row for row, sc in eligible if sc["service"] == "hours" and sc["notice_kind"] == "regular"]
-    temporary = [row for row, sc in eligible if sc["service"] == "hours"
-                 and sc["notice_kind"] == "temporary" and _active(sc, day)]
+    temporary = []
+    for row, sc in eligible:
+        if sc["service"] == "hours" and sc["notice_kind"] == "temporary":
+            period = _hours_period(sc, day)
+            if period is not None:
+                temporary.append((row, period.get("hours_aspect")))
     if temporary:
-        return temporary, regular, "temporary"
+        closed = [row for row, aspect in temporary if aspect == "closed"]
+        if closed:
+            # 明确闭馆覆盖常规开放、恢复条款和通常的晚间延时。
+            return closed, [], "temporary", "closed"
+        changed = [(row, aspect) for row, aspect in temporary if aspect != "regular_resume"]
+        active = changed or temporary
+        aspects = {aspect for _, aspect in active}
+        return [row for row, _ in active], regular, "temporary", next(iter(aspects)) if len(aspects) == 1 else None
 
     # 总体公告覆盖某馆、当日表格却未列该馆时，保留缺口，避免套用常规时间。
     schedule_documents = {row["document_id"] for row, sc in rows
                           if sc["service"] == "hours" and sc["notice_kind"] == "temporary"}
     covered_by_notice = any(row["document_id"] in schedule_documents and _covers(row, building)
                             and _active(row, day) for row, _ in rows)
-    return ([], [], "temporary") if covered_by_notice else (regular, [], "regular")
+    return ([], [], "temporary", None) if covered_by_notice else (regular, [], "regular", None)
 
 
 def _loan_aspects(question):
@@ -315,10 +338,14 @@ def search_library(store, question, limit=5, today=None, *, ranker=None, trace=N
 
     groups = []
     for building in buildings if hours else ():
-        primary, regular, kind = _hours_rows(rows, building, day)
+        primary, regular, kind, aspect = _hours_rows(rows, building, day)
         scope["notice_kind"] = kind
-        if kind == "regular" and day and _EXTENDED_HOURS.search(question):
-            scope["no_applicable_extension"] = True
+        if aspect in ("closed", "regular_resume"):
+            scope.setdefault("hours_schedule", {})[building] = aspect
+        if kind == "regular" and day and primary:
+            scope.setdefault("hours_schedule", {})[building] = "regular_fallback"
+            if _EXTENDED_HOURS.search(question):
+                scope["no_applicable_extension"] = True
         machine_supported = kind == "regular" and any(_MACHINE.search(row["text"]) for row in primary)
         if primary and (reading_hours or machine_supported):
             groups.append(rank_candidates(store, question, 1, rows=primary, ranker=ranker,
@@ -326,10 +353,16 @@ def search_library(store, question, limit=5, today=None, *, ranker=None, trace=N
         if not primary and reading_hours:
             gaps.append("现有资料没有{}在所问日期适用的开放时间。".format(building))
         # 晚间延时只调整截止时间。兼问几点开馆时，才补充常规开馆资料。
-        evening_only = primary and all(_scope(row).get("hours_aspect") == "evening_only" for row in primary)
-        if evening_only and re.search(r"开馆|开门|几点(?:开|能进)", question):
+        if aspect == "evening_only" and re.search(r"开馆|开门|几点(?:开|能进)", question):
             groups.append(rank_candidates(store, question, 1, rows=regular, ranker=ranker,
                                           trace=trace, topic="library", stage="regular_opening", fallback=True))
+        if aspect == "regular_resume" and _CLOCK_QUESTION.search(question):
+            # 恢复公告证明当天正常开放，具体钟点由同馆的常规表证明。
+            if regular:
+                groups.append(rank_candidates(store, question, 1, rows=regular, ranker=ranker,
+                                              trace=trace, topic="library", stage="resumed_hours", fallback=True))
+            else:
+                gaps.append("现有资料没有{}恢复常规开放后的具体时段。".format(building))
         if machine and not machine_supported:
             gaps.append("现有资料无法确认{}在所问时段的自助借还安排。".format(building))
 

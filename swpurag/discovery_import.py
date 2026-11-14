@@ -1,7 +1,9 @@
-"""Rebuild and check the independent admissions discovery corpus from archives."""
+"""Build and check an isolated discovery corpus from archived captures."""
 
 import argparse
 import json
+import sqlite3
+from contextlib import closing
 from datetime import datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -16,6 +18,7 @@ LOCAL = DATA / "local"
 CURATED = Path("samples")
 DISCOVERED = CURATED / "discovery"
 COUNTS = ("sources", "documents", "versions", "chunks")
+HISTORY_TABLES = ("sources", "documents", "versions", "chunks", "attempts")
 
 
 def read_list(path):
@@ -49,7 +52,9 @@ def checked_imports(store, pairs, output, phase, expected):
     for sample, receipt in pairs:
         result = import_capture(store, sample, receipt, DATA)
         fields = ("url", "fetched_at", "raw_sha256", "raw_path", "http_status")
-        metadata = {key: sample.get(key) for key in ("unit", "page_type", "admission_year", "role", "audience")}
+        fields_for_sample = ("unit", "page_type", "admission_year", "role", "audience",
+                             "campus", "building", "notice_kind", "effective_from", "effective_to", "service")
+        metadata = {key: sample[key] for key in fields_for_sample if key in sample}
         if result["status"] != "failed":
             version = store.db.execute(
                 "SELECT title, published_at, content_sha256 FROM versions WHERE id = ?", (result["version_id"],)
@@ -98,17 +103,37 @@ def validate_failures(store, sample, receipt, output):
                 raise ValueError("Unexpected result while checking failed import attempts")
 
 
+def database_rows(store):
+    return {table: [tuple(row) for row in store.db.execute(f"SELECT * FROM {table} ORDER BY id")]
+            for table in HISTORY_TABLES}
+
+
+def verify_history(store, baseline):
+    for table, rows in database_rows(store).items():
+        if rows[:len(baseline[table])] != baseline[table]:
+            raise ValueError(f"The snapshot's existing {table} rows changed")
+
+
+def verify_integrity(store):
+    if ([row[0] for row in store.db.execute("PRAGMA integrity_check")] != ["ok"]
+            or store.db.execute("PRAGMA foreign_key_check").fetchall()):
+        raise ValueError("SQLite integrity check failed")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=LOCAL / "discovery.sqlite3")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--records", type=Path, default=DISCOVERED, help="directory with pages.json and captures.json")
+    parser.add_argument("--snapshot", type=Path, help="read-only starting database for incremental validation")
     args = parser.parse_args()
-    base, additions = read_inputs(CURATED), read_inputs(DISCOVERED)
-    if {sample["url"] for sample, _ in base} & {sample["url"] for sample, _ in additions}:
-        parser.error("new manifest duplicates a curated URL")
+    base = [] if args.snapshot else read_inputs(CURATED)
+    additions = read_inputs(args.records)
     db = args.db.resolve()
     if db.parent != LOCAL.resolve() or db == (DATA / "corpus.sqlite3").resolve():
         parser.error("the validation database must be a new file under data/local/")
+    if args.snapshot and not args.snapshot.is_file():
+        parser.error("the starting database does not exist")
     if args.output.resolve() in {db, (DATA / "corpus.sqlite3").resolve()} or db.exists():
         parser.error("choose separate, unused validation database and output paths")
     LOCAL.mkdir(parents=True, exist_ok=True)
@@ -116,8 +141,15 @@ def main():
     with args.output.open("x", encoding="utf-8", newline="\n") as output:
         db.open("xb").close()
         with Store(db) as store:
+            if args.snapshot:
+                with closing(sqlite3.connect(args.snapshot.resolve().as_uri() + "?mode=ro", uri=True)) as source:
+                    source.backup(store.db)
             checked_imports(store, base, output, "base_import", "new")
             initial = store.stats()
+            history = database_rows(store)
+            original_urls = {row[0] for row in store.db.execute("SELECT url FROM documents")}
+            if original_urls & {sample["url"] for sample, _ in additions}:
+                raise ValueError("new manifest duplicates a URL in the starting database")
             checked_imports(store, additions, output, "discovery_import", "new")
             built = store.stats()
             checked_imports(store, base + additions, output, "offline_replay", "unchanged")
@@ -126,10 +158,15 @@ def main():
             if (built["documents"] - initial["documents"] != len(additions)
                     or replayed["attempts"] - built["attempts"] != len(base) + len(additions)):
                 raise ValueError("Unexpected rebuild or replay counts")
-            sample, receipt = next(pair for pair in additions + base if pair[0].get("format", "html") == "html")
-            validate_failures(store, sample, receipt, output)
+            for sample, receipt in additions:
+                if sample.get("format", "html") == "html":
+                    validate_failures(store, sample, receipt, output)
+            verify_history(store, history)
+            verify_integrity(store)
             record(output, "summary", base=initial, after_import=built, after_replay=replayed,
-                   admitted=[sample["id"] for sample, _ in additions], database=str(args.db))
+                   admitted=[sample["id"] for sample, _ in additions], database=str(args.db),
+                   snapshot=str(args.snapshot) if args.snapshot else None, starting_rows_retained=True,
+                   integrity_check="ok", foreign_key_check="ok")
     print("Saved", args.output)
 
 

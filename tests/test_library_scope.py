@@ -3,7 +3,9 @@
 import json
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
+from swpurag.answer import answer_question
 from swpurag.ingest import import_capture
 from swpurag.library_scope import search_library
 from swpurag.store import Store
@@ -104,3 +106,50 @@ class LibraryScopeTest(unittest.TestCase):
         hits, scope = self.search("12月18日成都二期图书馆会不会比平常晚关门？")
         self.assertEqual(scope["notice_kind"], "temporary")
         self.assertIn("22:30", hits[0]["text"])
+
+    def test_holiday_periods_select_closure_or_regular_hours_for_the_day(self):
+        manifest_path = ROOT / "samples/library-discovery/pages.json"
+        capture_path = ROOT / "samples/library-discovery/captures.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+        captures = json.loads(capture_path.read_text(encoding="utf-8-sig"))
+        by_url = {row["url"]: row for row in captures}
+        holiday = next(sample for sample in manifest if sample["id"] == "library-chengdu-2026-autumn-holiday")
+        receipt = by_url[holiday["url"]]
+        with Store(":memory:") as trial:
+            self.store.db.backup(trial.db)
+            self.assertEqual(import_capture(trial, holiday, receipt, ROOT / "data")["status"], "new")
+
+            hits, scope = search_library(trial, "2026年10月2日成都一期图书馆几点开门？")
+            self.assertEqual(scope["hours_schedule"], {"成都总馆": "closed"})
+            self.assertEqual([(hit["url"], hit["locator"]["paragraph"]) for hit in hits], [(holiday["url"], 2)])
+
+            hits, scope = search_library(trial, "2026年9月26日成都二期图书馆几点开门？")
+            self.assertEqual(scope["hours_schedule"], {"成都分馆": "regular_resume"})
+            self.assertEqual([hit["locator"]["paragraph"] for hit in hits], [2, 23])
+
+            hits, scope = search_library(trial, "2026年10月16日成都一期图书馆几点开门？")
+            self.assertEqual(scope["hours_schedule"], {"成都总馆": "regular_fallback"})
+            self.assertEqual([hit["locator"]["paragraph"] for hit in hits], [1])
+
+            # 重放错误的范围标注时，已导入的可用版本仍应生效。
+            periods = holiday["chunk_scopes"][0]["scope"]["hours_periods"]
+            periods[0]["effective_to"] = periods[1]["effective_from"]
+            result = import_capture(trial, holiday, receipt, ROOT / "data")
+            self.assertEqual(result["status"], "failed")
+            self.assertIn("non-overlapping", result["error"])
+            hits, scope = search_library(trial, "2026年10月2日成都一期图书馆几点开门？")
+            self.assertEqual(scope["hours_schedule"], {"成都总馆": "closed"})
+            self.assertEqual([hit["url"] for hit in hits], [holiday["url"]])
+
+    def test_regular_fallback_explains_archive_coverage_after_citation_validation(self):
+        # 模型只引用常规表，用系统查询范围补充无法核验当日变更的说明。
+        response = {"status": "answered", "claims": [{"text": "成都一期图书馆的常规开放时间是8:00至22:00。",
+                                                        "citations": [{"id": 1, "quote": "8:00--22:00"}]}],
+                    "follow_up": ""}
+        with patch("swpurag.answer.request_model", return_value=("mock", response)) as request:
+            answer = answer_question(self.store, "2026年10月16日成都一期图书馆晚上几点关门？")
+        self.assertEqual(answer["status"], "answered")
+        self.assertEqual(answer["claims"], response["claims"])
+        self.assertIn("现有归档未找到成都总馆在2026-10-16适用的临时开放安排", answer["scope_note"])
+        self.assertNotIn("10月16日", request.call_args.args[0])
+        self.assertNotIn("date", request.call_args.args[4])
