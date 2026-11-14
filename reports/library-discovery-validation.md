@@ -1,5 +1,7 @@
 # 图书馆通知栏目采集试点
 
+本报告保留初次试点的日期标注和实验结果。复现初次试点请使用提交 `55c6c51` 的代码和清单。按校级放假通知校正后的范围、补充题及默认库切换见 [图书馆假期日期修订与切换](library-holiday-promotion.md)。
+
 2026-11-14 在 Anaconda `SWPU_RAG` 中对照。基线从默认库做 SQLite 只读备份，候选库增量导入两份公告。本轮交付候选库及复跑记录，默认库仍为 15 篇、813 块、29 条导入记录。其 SHA-256 为 `df7b1fe342bd6396f6a55eaedc638da446911f0182ed7c6363bec90d06bf2a71`，采集和评测前后相同。[栏目发现与实际抓取记录](library-discovery-candidates.md) · [入库清单](../samples/library-discovery/pages.json)
 
 ## 采集与离线验证

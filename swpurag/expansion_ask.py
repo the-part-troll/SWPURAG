@@ -11,7 +11,7 @@ from pathlib import Path
 from .evaluate import ArchiveCheck, read_json
 from .hybrid_eval import read_sets
 from .routing_eval import (DISCOVERY, DISCOVERY_MANIFESTS, EXPANSION, EXPANSION_SHA256,
-                           LIBRARY_DISCOVERY_SHA256)
+                           LIBRARY_DISCOVERY_SHA256, LIBRARY_HOLIDAY_SHA256)
 
 
 QUESTION_IDS = ("A1", "A2", "N05", "N06", "N07", "E04", "Q6", "N04")
@@ -19,20 +19,28 @@ QUESTION_IDS = ("A1", "A2", "N05", "N06", "N07", "E04", "Q6", "N04")
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--db", type=Path, required=True)
+    parser.add_argument("--db", type=Path, help="omit to exercise the default CLI database")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--only", nargs="+")
     parser.add_argument("--library-discovery", type=Path, help="use the frozen library questions and archive manifests")
+    parser.add_argument("--library-holiday", action="store_true", help="include the frozen holiday date boundary questions")
     parser.add_argument("--baseline-package", type=Path, help="parent directory of the trusted historical swpurag package")
     args = parser.parse_args()
-    if not args.db.is_file() or args.db.resolve() == Path("data/corpus.sqlite3").resolve():
-        parser.error("select the existing isolated validation database")
+    if not (args.db or Path("data/corpus.sqlite3")).is_file():
+        parser.error("the evaluation database does not exist")
+    if args.library_holiday and not args.library_discovery:
+        parser.error("holiday evaluation requires --library-discovery")
     manifests = list(DISCOVERY_MANIFESTS)
     if args.library_discovery:
         directory = args.library_discovery
         path, digest = directory / "acceptance.json", LIBRARY_DISCOVERY_SHA256
         manifests.append((directory / "pages.json", directory / "captures.json"))
         questions = read_json(path)
+        if args.library_holiday:
+            holiday = directory / "holiday-acceptance.json"
+            if hashlib.sha256(holiday.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != LIBRARY_HOLIDAY_SHA256:
+                parser.error("library holiday file differs from the frozen questions")
+            questions.extend(read_json(holiday))
         allowed = tuple(row["id"] for row in questions)
     else:
         path, digest = EXPANSION, EXPANSION_SHA256
@@ -54,10 +62,12 @@ def main():
         launcher = ("import runpy, sys; sys.path.insert(0, sys.argv.pop(1)); "
                     "runpy.run_module('swpurag', run_name='__main__', alter_sys=True)")
         cli = [sys.executable, "-B", "-c", launcher, str(directory)]
+    if args.db:
+        cli.extend(("--db", str(args.db)))
     with args.output.open("x", encoding="utf-8", newline="\n") as output:
         for qid in dict.fromkeys(args.only or allowed):
             process = subprocess.run(
-                [*cli, "--db", str(args.db), "ask", questions[qid], "--json"],
+                [*cli, "ask", questions[qid], "--json"],
                 capture_output=True, encoding="utf-8", env=dict(os.environ, PYTHONIOENCODING="utf-8"),
             )
             if process.returncode not in (0, 1) or not process.stdout.strip():

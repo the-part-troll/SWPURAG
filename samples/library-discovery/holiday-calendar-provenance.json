@@ -1,0 +1,58 @@
+{
+  "calendar": {
+    "title": "关于2026年中秋节、国庆节放假安排的通知",
+    "unit": "党政办公室（校地合作办公室）",
+    "published_at": "2026-09-11",
+    "url": "https://www.swpu.edu.cn/info/1312/44668.htm",
+    "capture": "holiday-calendar-capture.json",
+    "body_selector": "#vsb_content",
+    "periods": [
+      {
+        "holiday": "中秋节",
+        "effective_from": "2026-09-25",
+        "effective_to": "2026-09-27",
+        "locator": {
+          "kind": "html",
+          "selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(3)",
+          "line": 145,
+          "column": 4443,
+          "paragraph": 3
+        },
+        "quote": "中秋节：9月25日（星期五）至27日（星期日）放假，共3天。"
+      },
+      {
+        "holiday": "国庆节",
+        "effective_from": "2026-10-01",
+        "effective_to": "2026-10-07",
+        "locator": {
+          "kind": "html",
+          "selector": "#vsb_content > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(4)",
+          "line": 145,
+          "column": 7492,
+          "paragraph": 4
+        },
+        "quote": "国庆节：10月1日（星期四）至7日（星期三）放假调休，共7天。"
+      }
+    ],
+    "use": "校级通知只用于确定图书馆公告所指的假期日期范围，单独保留归档，不进入问答检索库。"
+  },
+  "library_notice": {
+    "sample": "library-chengdu-2026-autumn-holiday",
+    "url": "https://lib.swpu.edu.cn/1849.8080/noticex/20260915.html",
+    "capture": "captures.json",
+    "locator": {
+      "kind": "html",
+      "selector": "#vv_content > p:nth-of-type(2)",
+      "line": 118,
+      "column": 1,
+      "paragraph": 2
+    },
+    "calendar_reference": "根据学校《关于2026年中秋节、国庆节放假安排的通知》精神",
+    "closure_clauses": [
+      {"line": 119, "quote": "中秋节：9月25日，闭馆1天。"},
+      {"line": 120, "quote": "国庆节：10月1日-3日，闭馆3天。"}
+    ],
+    "regular_clause": {"line": 121, "quote": "其余日期均正常开放"},
+    "use": "图书馆公告提供馆舍开闭馆结论。其余日期限于两段学校假期，扣除公告明确的闭馆日。具体钟点由同馆常规时间表提供。"
+  }
+}

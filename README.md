@@ -61,9 +61,9 @@ python -B -m swpurag serve --port 8765
 
 15 篇独立验证库的分段适用范围、个人审核答复和前后对照见 [扩库验收报告](reports/expansion-acceptance.md)。
 
-默认库切换、回滚及三类浏览器实测见 [默认库更新记录](reports/default-corpus-promotion.md)。
+当前 17 篇默认库的验收、切换、回滚及三类浏览器实测见 [图书馆假期日期修订与切换](reports/library-holiday-promotion.md)。前次纳入四川网报资料的记录见 [15 篇默认库更新](reports/default-corpus-promotion.md)。
 
-图书馆通知栏目试点使用独立候选库。采集、离线导入和问答对照见 [图书馆栏目试点报告](reports/library-discovery-validation.md)。
+图书馆栏目采集、离线导入和问答对照见 [图书馆栏目试点报告](reports/library-discovery-validation.md)。
 
 ## 工作区
 
@@ -106,13 +106,14 @@ python -B -m swpurag serve --port 8765
 
 ## 运行方式
 
-在已激活 `SWPU_RAG` 的终端进入项目目录。首次从空库重建时，依次导入 13 份基础原件与两份四川网报归档。`import` 从随项目保留的原件读取数据。已有默认库可直接查询。离线重建会按本次执行记录导入历史，切换时保留的历史见默认库更新记录。
+在已激活 `SWPU_RAG` 的终端进入项目目录。从空库离线重建时，依次导入 13 份基础原件、两份四川网报归档和两份图书馆通知，共 17 篇、819 个正文块。`import` 从随项目保留的原件读取数据。校级放假通知单独归档，作为图书馆公告日期标注的依据。已有默认库可直接查询。空库重建生成本次导入的记录，切换时保留的 29 条旧记录可从备份回查。[日期标注出处](samples/library-discovery/holiday-calendar-provenance.json) · [默认库切换记录](reports/library-holiday-promotion.md)
 
 ```powershell
 Set-Location 'P:\SWPURAG'
 $env:PYTHONIOENCODING = 'utf-8'
 python -B -m swpurag import --manifest samples/pages.json --captures samples/captures.json
 python -B -m swpurag import --manifest samples/discovery/pages.json --captures samples/discovery/captures.json
+python -B -m swpurag import --manifest samples/library-discovery/pages.json --captures samples/library-discovery/captures.json
 ```
 
 ```powershell

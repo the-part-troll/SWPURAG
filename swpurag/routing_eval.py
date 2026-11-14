@@ -29,6 +29,7 @@ EXPANSION_NEGATIVES = Path("samples/discovery/expansion-negatives.json")
 EXPANSION_SHA256 = "4721faab4f77cbb804d29e6f3a9d9adf7b3febf7c5d106b38ba9aea314a1072d"
 EXPANSION_NEGATIVES_SHA256 = "ef95fa39d175a48f882cdefedb2b7a533076aea827c26364d98f261cf05b6304"
 LIBRARY_DISCOVERY_SHA256 = "78c3b5c65aece48912f306b7236f5679b4dbf0149f3ac293f94f01d5b4daaab4"
+LIBRARY_HOLIDAY_SHA256 = "b75a2bb4a6e38776fb021e333631c8d5d632aa8dcffd24aa91f4279cbf81d88f"
 
 
 def load_baseline(path):
@@ -45,7 +46,8 @@ def load_baseline(path):
 
 
 def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), discovery=(),
-        expansion=(), negative_overlay=None, archive=None, library=(), library_label_store=None):
+        expansion=(), negative_overlay=None, archive=None, library=(), library_label_store=None,
+        holiday=()):
     rows = list(store.current_chunks())
     if archive is None and (store.stats()["documents"], len(rows)) != (13, 747):
         raise ValueError("The routing comparison requires the original 13 documents and 747 blocks")
@@ -65,15 +67,18 @@ def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), di
         validate_labels(discovery, rows, samples, archive, size=(6, 8))
     if expansion:
         validate_labels(expansion, rows, samples, archive, size=(4, 6))
-    if library:
+    if library or holiday:
         # 新公告在基线库中缺失，仍以候选库和归档原件核验同一套冻结标注。
         label_rows = list(library_label_store.current_chunks()) if library_label_store else rows
+    if library:
         validate_labels(library, label_rows, samples, archive, size=(6, 8))
+    if holiday:
+        validate_labels(holiday, label_rows, samples, archive, size=(4, 4))
     suite_by_id = {q["id"]: suite for suite, dataset in
                    (("routing-acceptance", acceptance), ("boundary-acceptance", boundary),
                     ("discovery-acceptance", discovery), ("expansion-acceptance", expansion),
-                    ("library-discovery", library)) for q in dataset}
-    questions = frozen + old + acceptance + list(boundary) + list(discovery) + list(expansion) + list(library)
+                    ("library-discovery", library), ("library-holiday", holiday)) for q in dataset}
+    questions = frozen + old + acceptance + list(boundary) + list(discovery) + list(expansion) + list(library) + list(holiday)
     negative_overlay = negative_overlay or {}
     if set(negative_overlay) - {q["id"] for q in questions}:
         raise ValueError("Wrong-scope overlay refers to an unknown question")
@@ -93,6 +98,8 @@ def run(store, output, acceptance, prepare=prepare_retrieval, *, boundary=(), di
             result["suite"] = suite_by_id[q["id"]]
         if "expected_answer_status" in q:
             result["expected_answer_status"] = q["expected_answer_status"]
+        if "expected_hours_schedule" in q:
+            result["expected_hours_schedule"] = q["expected_hours_schedule"]
         if "wrong_scope" in q:
             candidate_ids = {key for batch in trace["batches"] for key in batch["candidate_ids"]}
             result["wrong_scope_candidate_counts"] = [sum(locate(rows_by_id[key], spec, samples)
@@ -154,10 +161,13 @@ def main():
     parser.add_argument("--discovery", action="store_true", help="include the frozen discovery acceptance set")
     parser.add_argument("--expansion", action="store_true", help="include the expansion acceptance set and scope overlay")
     parser.add_argument("--library-discovery", type=Path, help="library notice manifests and frozen questions")
+    parser.add_argument("--library-holiday", action="store_true", help="include the frozen holiday date boundary set")
     parser.add_argument("--library-label-db", type=Path, help="validate new labels against this database when replaying the baseline")
     args = parser.parse_args()
     if args.expansion and not (args.boundary and args.discovery):
         parser.error("expansion replay requires --boundary and --discovery")
+    if args.library_holiday and not args.library_discovery:
+        parser.error("holiday replay requires --library-discovery")
     if args.discovery and args.db.resolve() == Path("data/corpus.sqlite3").resolve():
         parser.error("the discovery suite requires --db for an isolated validation database")
     if args.library_label_db and not (args.library_discovery and args.library_label_db.is_file()):
@@ -182,13 +192,18 @@ def main():
             parser.error("discovery file differs from the frozen questions")
         discovery = read_json(DISCOVERY)
     manifests = list(DISCOVERY_MANIFESTS) if args.discovery else []
-    library = ()
+    library, holiday = (), ()
     if args.library_discovery:
         directory = args.library_discovery
         path = directory / "acceptance.json"
         if hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != LIBRARY_DISCOVERY_SHA256:
             parser.error("library discovery file differs from the frozen questions")
         library = read_json(path)
+        if args.library_holiday:
+            path = directory / "holiday-acceptance.json"
+            if hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != LIBRARY_HOLIDAY_SHA256:
+                parser.error("library holiday file differs from the frozen questions")
+            holiday = read_json(path)
         manifests.append((directory / "pages.json", directory / "captures.json"))
     archive = ArchiveCheck(Path("data"), extra_manifests=manifests) if manifests else None
     expansion, overlay = (), None
@@ -204,7 +219,7 @@ def main():
         with args.output.open("x", encoding="utf-8") as output:
             run(store, output, acceptance, prepare, boundary=boundary, discovery=discovery,
                 expansion=expansion, negative_overlay=overlay, archive=archive, library=library,
-                library_label_store=library_label_store)
+                library_label_store=library_label_store, holiday=holiday)
     print("Saved", args.output)
 
 

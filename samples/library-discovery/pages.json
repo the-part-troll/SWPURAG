@@ -12,6 +12,7 @@
     "campus": "成都校区",
     "building": "成都总馆、成都分馆",
     "notice_kind": "temporary",
+    "hours_periods_provenance": "holiday-calendar-provenance.json",
     "body_selector": "#vv_content",
     "minimum_body_chars": 70,
     "chunk_scopes": [
@@ -32,7 +33,7 @@
             },
             {
               "effective_from": "2026-09-26",
-              "effective_to": "2026-09-30",
+              "effective_to": "2026-09-27",
               "hours_aspect": "regular_resume"
             },
             {
@@ -42,7 +43,7 @@
             },
             {
               "effective_from": "2026-10-04",
-              "effective_to": "2026-10-04",
+              "effective_to": "2026-10-07",
               "hours_aspect": "regular_resume"
             }
           ]
